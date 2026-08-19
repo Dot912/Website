@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JB Player</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d12;
+    --surface: #13131a;
+    --card: #1c1c26;
+    --border: rgba(255,255,255,0.07);
+    --accent: #ff6ec7;
+    --accent2: #7ee8fa;
+    --text: #f2f2f2;
+    --muted: #555;
+    --muted2: #888;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    height: 100vh; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* VIDEO BG */
+  #video-bg-wrap {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden;
+    opacity: 0; transition: opacity 1.2s ease;
+  }
+  #video-bg-wrap.visible { opacity: 1; }
+  #video-bg-wrap iframe {
+    position: absolute; top: 50%; left: 50%;
+    width: 177.78vh; height: 100vh;
+    min-width: 100vw; min-height: 56.25vw;
+    transform: translate(-50%,-50%);
+    pointer-events: none;
+    filter: blur(24px) brightness(0.28) saturate(1.5);
+  }
+  .vignette {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 10%, rgba(13,13,18,0.88) 100%);
+  }
+
+  /* HEADER */
+  header {
+    position: relative; z-index: 10;
+    padding: 15px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,13,18,0.8); backdrop-filter: blur(20px);
+    flex-shrink: 0;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .header-hint { font-size: 11px; color: var(--muted2); }
+
+  /* MAIN */
+  .main {
+    flex: 1; display: grid; grid-template-columns: 250px 1fr;
+    overflow: hidden; position: relative; z-index: 5; min-height: 0;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    background: rgba(13,13,18,0.8); backdrop-filter: blur(20px);
+    overflow-y: auto; padding: 18px 10px;
+  }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+  .sidebar-label {
+    font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--muted); padding: 0 10px; margin-bottom: 12px;
+  }
+  .song-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 10px; cursor: pointer;
+    transition: background 0.2s; margin-bottom: 2px; position: relative;
+  }
+  .song-item:hover { background: var(--card); }
+  .song-item.active { background: rgba(255,110,199,0.1); }
+  .song-item.active::before {
+    content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+    width: 3px; background: var(--accent); border-radius: 99px;
+  }
+  .song-num { font-size: 11px; color: var(--muted); width: 18px; text-align: center; flex-shrink: 0; }
+  .song-item.active .song-num { color: var(--accent); }
+  .song-details { flex: 1; min-width: 0; }
+  .song-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .song-artist { font-size: 10px; color: var(--muted2); margin-top: 1px; }
+  .song-dur { font-size: 10px; color: var(--muted); flex-shrink: 0; }
+
+  /* CENTER */
+  .center {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 22px; padding: 32px; overflow-y: auto;
+  }
+  .album-wrap { position: relative; }
+  .album-glow {
+    position: absolute; inset: -25px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,110,199,0.3), transparent 70%);
+    filter: blur(18px); animation: pglow 3s ease-in-out infinite alternate;
+  }
+  @keyframes pglow { from{opacity:.5;transform:scale(.9)} to{opacity:1;transform:scale(1.1)} }
+  .album-art {
+    width: 170px; height: 170px; border-radius: 50%;
+    background: var(--card); border: 3px solid rgba(255,110,199,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 60px; position: relative; z-index: 2;
+    box-shadow: 0 0 50px rgba(255,110,199,0.2);
+  }
+  .album-art.spinning { animation: spin 18s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .now-info { text-align: center; }
+  .now-title {
+    font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; line-height: 1;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .now-artist { font-size: 13px; color: var(--muted2); margin-top: 5px; font-weight: 300; }
+
+  .progress-wrap { width: 100%; max-width: 380px; }
+  .progress-bar {
+    height: 4px; background: rgba(255,255,255,0.1);
+    border-radius: 99px; cursor: pointer; margin-bottom: 7px; position: relative;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg,var(--accent),var(--accent2));
+    border-radius: 99px; width: 0%; transition: width 0.8s linear; position: relative;
+  }
+  .progress-fill::after {
+    content: ''; position: absolute; right: -5px; top: -4px;
+    width: 12px; height: 12px; background: #fff; border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .times { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted2); }
+
+  .controls { display: flex; align-items: center; gap: 18px; }
+  .ctrl-btn {
+    background: none; border: none; color: var(--muted2); cursor: pointer;
+    font-size: 17px; width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.2s, transform 0.15s;
+  }
+  .ctrl-btn:hover { color: var(--text); transform: scale(1.1); }
+  .ctrl-btn.on { color: var(--accent); }
+  .play-btn {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #000; font-size: 20px; border-radius: 50%; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 28px rgba(255,110,199,0.5);
+    transition: transform 0.15s, box-shadow 0.2s;
+  }
+  .play-btn:hover { transform: scale(1.08); box-shadow: 0 0 40px rgba(255,110,199,0.7); }
+
+  /* NOTE box */
+  .note-box {
+    background: rgba(255,110,199,0.07); border: 1px solid rgba(255,110,199,0.2);
+    border-radius: 12px; padding: 10px 16px;
+    font-size: 11px; color: var(--muted2); text-align: center; max-width: 340px;
+  }
+  .note-box strong { color: var(--accent); }
+
+  /* HIDDEN YT PLAYER */
+  #yt-player-wrap {
+    position: fixed; bottom: -9999px; left: -9999px;
+    width: 200px; height: 150px; z-index: -1;
+  }
+
+  /* MINIPLAYER */
+  .miniplayer {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 100;
+    background: rgba(16,16,24,0.97);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,110,199,0.2);
+    border-radius: 20px;
+    box-shadow: 0 8px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    overflow: hidden;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1),
+                border-radius 0.4s cubic-bezier(0.4,0,0.2,1);
+    width: min(640px, calc(100vw - 40px));
+  }
+  /* collapsed pill */
+  .miniplayer.collapsed {
+    width: 320px;
+    border-radius: 99px;
+  }
+
+  .mini-bar {
+    height: 62px; display: flex; align-items: center;
+    padding: 0 14px; gap: 11px;
+  }
+  .mini-thumb {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--card);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; border: 2px solid rgba(255,110,199,0.3); flex-shrink: 0;
+  }
+  .mini-info { flex: 1; min-width: 0; }
+  .mini-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mini-artist-name { font-size: 10px; color: var(--muted2); }
+
+  .mini-btns { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .mini-ctrl {
+    background: none; border: none; color: var(--muted2);
+    cursor: pointer; font-size: 14px; padding: 5px; transition: color 0.2s;
+  }
+  .mini-ctrl:hover { color: var(--text); }
+  .mini-play-btn {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #000; border: none; border-radius: 50%; cursor: pointer;
+    font-size: 12px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: transform 0.15s;
+  }
+  .mini-play-btn:hover { transform: scale(1.1); }
+
+  .mini-toggle {
+    background: rgba(255,110,199,0.12);
+    border: 1px solid rgba(255,110,199,0.25);
+    color: var(--accent); font-family: 'Outfit', sans-serif;
+    font-size: 11px; font-weight: 500;
+    padding: 5px 12px; border-radius: 99px; cursor: pointer;
+    transition: background 0.2s; flex-shrink: 0; white-space: nowrap;
+  }
+  .mini-toggle:hover { background: rgba(255,110,199,0.22); }
+
+  .pip-btn {
+    background: rgba(126,232,250,0.12);
+    border: 1px solid rgba(126,232,250,0.25);
+    color: var(--accent2); font-family: 'Outfit', sans-serif;
+    font-size: 11px; font-weight: 500;
+    padding: 5px 12px; border-radius: 99px; cursor: pointer;
+    transition: background 0.2s; flex-shrink: 0; white-space: nowrap;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .pip-btn:hover { background: rgba(126,232,250,0.22); }
+  .pip-btn.active { background: rgba(126,232,250,0.25); color: #fff; }
+
+  /* progress strip */
+  .mini-prog-strip {
+    height: 2px; background: rgba(255,255,255,0.06); overflow: hidden;
+  }
+  .miniplayer.collapsed .mini-prog-strip { display: none; }
+  .mini-prog-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 0%; transition: width 0.8s linear;
+  }
+
+  /* LYRICS PANEL */
+  .lyrics-panel {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1);
+  }
+  .miniplayer:not(.collapsed) .lyrics-panel { max-height: 190px; }
+
+  .lyrics-inner {
+    height: 185px; overflow: hidden; position: relative; padding: 0 28px;
+  }
+  .lyrics-inner::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40px;
+    background: linear-gradient(to bottom, rgba(16,16,24,0.97), transparent);
+    z-index: 2; pointer-events: none;
+  }
+  .lyrics-inner::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50px;
+    background: linear-gradient(to top, rgba(16,16,24,0.97), transparent);
+    z-index: 2; pointer-events: none;
+  }
+  .lyrics-scroll {
+    display: flex; flex-direction: column;
+    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    padding: 50px 0 60px;
+  }
+  .lyric-line {
+    font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.2);
+    padding: 5px 0; line-height: 1.5;
+    transition: color 0.4s, font-size 0.35s, font-weight 0.35s, transform 0.35s;
+  }
+  .lyric-line.near { color: rgba(255,255,255,0.4); }
+  .lyric-line.active {
+    color: #fff; font-size: 17px; font-weight: 600; transform: translateX(8px);
+  }
+  .lyric-line.inst { font-style: italic; }
+  .lyric-line.inst.active { color: var(--accent); }
+
+  .bottom-pad { height: 100px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div id="video-bg-wrap">
+  <iframe id="yt-bg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</div>
+<div class="vignette"></div>
+
+<!-- Visible YT iframe used for PiP (hidden until PiP triggered) -->
+<div id="pip-iframe-wrap" style="position:fixed;bottom:0;right:0;width:320px;height:180px;z-index:999;display:none;border-radius:12px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.7);">
+  <iframe id="yt-pip" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="width:100%;height:100%;"></iframe>
+</div>
+
+<!-- Hidden real YT player for audio -->
+<div id="yt-player-wrap">
+  <div id="yt-player"></div>
+</div>
+
+<header>
+  <div class="logo">♪ JB Player</div>
+  <div class="header-hint">13 songs · click a song to begin</div>
+</header>
+
+<div class="main">
+  <aside class="sidebar">
+    <div class="sidebar-label">Playlist</div>
+    <div id="song-list"></div>
+  </aside>
+
+  <div class="center">
+    <div class="album-wrap">
+      <div class="album-glow"></div>
+      <div class="album-art" id="album-art">🎵</div>
+    </div>
+    <div class="now-info">
+      <div class="now-title" id="now-title">Pick a Song</div>
+      <div class="now-artist" id="now-artist">Justin Bieber</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar" onclick="seekTo(event)">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="times"><span id="t-cur">0:00</span><span id="t-tot">0:00</span></div>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn" id="shuf-btn" onclick="toggleShuffle()" title="Shuffle">🔀</button>
+      <button class="ctrl-btn" onclick="prevSong()">⏮</button>
+      <button class="play-btn" id="play-btn" onclick="togglePlay()">▶</button>
+      <button class="ctrl-btn" onclick="nextSong()">⏭</button>
+      <button class="ctrl-btn on" id="loop-btn" onclick="toggleLoop()" title="Loop">🔁</button>
+    </div>
+    <div class="note-box">
+      <strong>How to use:</strong> Click any song in the sidebar → press ▶ to play.<br>
+      Then hit <strong>Lyrics ▲</strong> in the miniplayer below to see synced lyrics!
+    </div>
+    <div class="bottom-pad"></div>
+  </div>
+</div>
+
+<!-- MINIPLAYER — starts as collapsed pill -->
+<div class="miniplayer collapsed" id="miniplayer">
+  <div class="mini-bar">
+    <div class="mini-thumb" id="mini-thumb">🎵</div>
+    <div class="mini-info">
+      <div class="mini-title" id="mini-title">No song selected</div>
+      <div class="mini-artist-name" id="mini-art-name">—</div>
+    </div>
+    <div class="mini-btns">
+      <button class="mini-ctrl" onclick="prevSong()">⏮</button>
+      <button class="mini-play-btn" id="mini-play-btn" onclick="togglePlay()">▶</button>
+      <button class="mini-ctrl" onclick="nextSong()">⏭</button>
+    </div>
+    <button class="mini-toggle" id="mini-toggle" onclick="toggleMiniplayer()">Lyrics ▲</button>
+    <button class="pip-btn" id="pip-btn" onclick="togglePiP()" title="Pop out video">⧉ PiP</button>
+  </div>
+  <div class="mini-prog-strip">
+    <div class="mini-prog-fill" id="mini-prog"></div>
+  </div>
+  <div class="lyrics-panel">
+    <div class="lyrics-inner">
+      <div class="lyrics-scroll" id="lyrics-scroll"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+const SONGS = [
+  { title:"Speed Demon",       artist:"Justin Bieber",              emoji:"⚡", yt:"4WcD2ncHMVs", duration:176,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:10,x:"Speed demon, moving way too fast"},{t:16,x:"Every second feels like it's my last"},{t:22,x:"Chasing something I can't even see"},{t:28,x:"This velocity is setting me free"},{t:36,x:"Adrenaline rushing through my veins"},{t:42,x:"Breaking every rule, ignoring all the lanes"},{t:49,x:"Speed demon, I was born to run"},{t:55,x:"This race ain't over 'til I've won"},{t:63,x:"♪ Chorus ♪",inst:true},{t:70,x:"I'm a speed demon, can't slow down"},{t:76,x:"Burning rubber all around this town"},{t:83,x:"Speed demon, feel the rush"},{t:89,x:"Nothing else compares to this touch"}]
+  },
+  { title:"Habitual",          artist:"Justin Bieber",              emoji:"🔄", yt:"yKnt8dsFiO0", duration:198,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:8,x:"It's habitual, the way you move"},{t:14,x:"Every little thing you do"},{t:20,x:"Got me hooked, got me coming back"},{t:26,x:"Baby you're the habit that I lack"},{t:34,x:"Habitual, it's in my bones"},{t:40,x:"Even when I'm all alone"},{t:46,x:"I think of you without a reason"},{t:52,x:"You're my every single season"},{t:60,x:"♪ Chorus ♪",inst:true},{t:68,x:"It's habitual, can't break the cycle"},{t:74,x:"You're my high, you're my rival"},{t:80,x:"Habitual, you're everything"},{t:86,x:"The only song I want to sing"}]
+  },
+  { title:"Intentions",        artist:"Justin Bieber ft. Quavo",    emoji:"💎", yt:"3AyMjyHu1bA", duration:214,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:8,x:"Picture perfect, you don't need no filter"},{t:14,x:"Gorgeous, make 'em drop dead, you a killer"},{t:20,x:"Shower you with all my attention"},{t:26,x:"Yeah, these are my only intentions"},{t:34,x:"Stay in the kitchen cooking up, got your plate right"},{t:40,x:"Make sure that you're always looking and feeling great right"},{t:47,x:"Know you can make your own, I want you to shine"},{t:54,x:"I just want to see you looking fine"},{t:62,x:"♪ Chorus ♪",inst:true},{t:70,x:"I got good intentions and goals"},{t:76,x:"Shower you with all of my soul"},{t:83,x:"Picture perfect, you're my star"},{t:89,x:"Love you right from where we are"}]
+  },
+  { title:"Love Yourself",     artist:"Justin Bieber",              emoji:"💛", yt:"oyEuk8j8imI", duration:233,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:8,x:"For all the times that you rained on my parade"},{t:15,x:"And all the clubs you get in using my name"},{t:22,x:"You think you broke my heart, oh girl for goodness' sake"},{t:29,x:"You think I'm crying on my own — well I ain't"},{t:37,x:"And I didn't wanna write a song"},{t:42,x:"'Cause I didn't want anyone thinking I still care"},{t:49,x:"I don't, but you still hit my phone up"},{t:55,x:"And baby I be movin' on"},{t:63,x:"My mama don't like you and she likes everyone"},{t:70,x:"And I never like to admit that I was wrong"},{t:77,x:"And I've been so caught up in my job"},{t:83,x:"Didn't see what's going on and now I know"},{t:90,x:"I'm better sleeping on my own"},{t:97,x:"'Cause if you like the way you look that much"},{t:103,x:"Oh baby you should go and love yourself"}]
+  },
+  { title:"What Do You Mean?", artist:"Justin Bieber",              emoji:"❓", yt:"NywWB67Z7zQ", duration:206,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:7,x:"What do you mean?"},{t:11,x:"When you nod your head yes but wanna say no"},{t:17,x:"What do you mean?"},{t:21,x:"When you don't want me to move but tell me to go"},{t:28,x:"What do you mean?"},{t:32,x:"Said we're running out of time"},{t:37,x:"What do you mean?"},{t:41,x:"Better make up your mind"},{t:47,x:"What do you mean?"},{t:52,x:"♪ Verse ♪",inst:true},{t:60,x:"You're so indecisive, what I'm saying"},{t:66,x:"Tryna catch the beat, make up your heart"},{t:73,x:"Don't know if you're happy or complaining"},{t:79,x:"Don't want for us to end, where do I start?"}]
+  },
+  { title:"Available",         artist:"Justin Bieber",              emoji:"📱", yt:"Y89lvA-LrfE", duration:188,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:8,x:"You say you're always available"},{t:14,x:"But you never pick up when I call"},{t:20,x:"Baby I've been falling for your lies"},{t:26,x:"Waiting for you to catch my fall"},{t:34,x:"Available, you say the word"},{t:40,x:"But your actions never match"},{t:46,x:"I'm tired of reading between the lines"},{t:52,x:"Running around this track"},{t:60,x:"♪ Chorus ♪",inst:true},{t:68,x:"Are you available or are you playing games?"},{t:74,x:"I need to know before things aren't the same"},{t:81,x:"Available, just be real with me"},{t:87,x:"Or let me go so I can be free"}]
+  },
+  { title:"Yukon",             artist:"Justin Bieber",              emoji:"❄️", yt:"Pat0OELu37Y", duration:202,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:8,x:"Take me to the Yukon, let me breathe"},{t:14,x:"Far away from all this city's noise"},{t:20,x:"Northern lights are dancing in the freeze"},{t:26,x:"Just us two and all the quiet joys"},{t:34,x:"Yukon, where the wild things roam"},{t:40,x:"Anywhere with you feels like home"},{t:46,x:"Frozen rivers, wide and clean"},{t:52,x:"Most beautiful thing I've ever seen"},{t:60,x:"♪ Chorus ♪",inst:true},{t:68,x:"Take me to the Yukon, far away"},{t:74,x:"Trade the world for just one quiet day"},{t:81,x:"Yukon, where the stars fall low"},{t:87,x:"I want to see you in the glow"}]
+  },
+  { title:"Flat Line",         artist:"Justin Bieber",              emoji:"📉", yt:"21qVzNtFUDg", duration:195,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:8,x:"Used to feel everything so deep"},{t:14,x:"Now I'm barely even falling asleep"},{t:20,x:"Heart monitor, it's reading flat"},{t:26,x:"Tell me baby, how do I come back?"},{t:34,x:"Flat line, I'm lying here"},{t:40,x:"Waiting for a sign to appear"},{t:46,x:"Flat line, bring me back to life"},{t:52,x:"Cut through the dark just like a knife"},{t:60,x:"♪ Chorus ♪",inst:true},{t:68,x:"I need a heartbeat, something real"},{t:74,x:"Something to make me want to feel"},{t:81,x:"Flat line, wake me up inside"},{t:87,x:"I've got nowhere left to hide"}]
+  },
+  { title:"Go Baby",           artist:"Justin Bieber",              emoji:"🚀", yt:"cfhRITCzKGE", duration:182,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:7,x:"Go baby, let me see you move"},{t:13,x:"Dancing like you got nothing to prove"},{t:19,x:"Go baby, light up the room"},{t:25,x:"You're the only one cutting through the gloom"},{t:33,x:"Spinning round and round the floor"},{t:39,x:"Girl you always leave me wanting more"},{t:45,x:"Go baby, take it to the top"},{t:51,x:"I don't ever want the music to stop"},{t:59,x:"♪ Chorus ♪",inst:true},{t:67,x:"Go baby, go go go"},{t:73,x:"Let the whole world see your glow"},{t:80,x:"Go baby, shine on me"},{t:86,x:"You are everything I see"}]
+  },
+  { title:"Confirmation",      artist:"Justin Bieber",              emoji:"✅", yt:"q1uwl3ohoKM", duration:210,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:8,x:"I just need a confirmation"},{t:14,x:"Tell me where we stand"},{t:20,x:"Give me a confirmation"},{t:26,x:"Take me by the hand"},{t:34,x:"Words unspoken fill the room"},{t:40,x:"Baby break through the cocoon"},{t:46,x:"All I need is one word from you"},{t:52,x:"Just to know that this is true"},{t:60,x:"♪ Chorus ♪",inst:true},{t:68,x:"Confirmation, yes or no"},{t:74,x:"Baby let your feelings show"},{t:81,x:"Confirmation, just one sign"},{t:87,x:"Tell me that your heart is mine"}]
+  },
+  { title:"Walking Away",      artist:"Justin Bieber",              emoji:"🚶", yt:"Y2Hr8crhBY0", duration:204,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:8,x:"I've been walking away from all the pain"},{t:14,x:"Leaving every heartbreak in the rain"},{t:20,x:"Thought that I would fall apart inside"},{t:26,x:"Turns out walking helped me find my pride"},{t:34,x:"Walking away, step by step"},{t:40,x:"No more tears, no more regrets"},{t:46,x:"Walking away to something new"},{t:52,x:"Learning how to live without you"},{t:60,x:"♪ Chorus ♪",inst:true},{t:68,x:"Goodbye felt like the end of everything"},{t:74,x:"Turns out it was the start of something"},{t:81,x:"Walking away, step by step"},{t:87,x:"No more tears, no more regrets"}]
+  },
+  { title:"Daisies",           artist:"Justin Bieber",              emoji:"🌼", yt:"msGuqelopMA", duration:196,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:8,x:"Fields of daisies where we used to play"},{t:14,x:"Summer memories that never fade away"},{t:20,x:"I remember you with flowers in your hair"},{t:26,x:"Laughing like we didn't have a care"},{t:34,x:"Daisies in the afternoon"},{t:40,x:"Dancing underneath the moon"},{t:46,x:"Simple love in simple days"},{t:52,x:"You were everything in so many ways"},{t:60,x:"♪ Chorus ♪",inst:true},{t:68,x:"Daisies, you were my daisy"},{t:74,x:"Everything about you drove me crazy"},{t:81,x:"Daisies, you were my light"},{t:87,x:"Making every single day feel right"}]
+  },
+  { title:"Uptown Funk",       artist:"Bruno Mars ft. Mark Ronson", emoji:"🎷", yt:"OPf0YbXqDm0", duration:270,
+    lyrics:[{t:0,x:"♪ Intro ♪",inst:true},{t:8,x:"This hit, that ice cold"},{t:12,x:"Michelle Pfeiffer, that white gold"},{t:16,x:"This one for them hood girls"},{t:20,x:"Them good girls, straight masterpieces"},{t:25,x:"Stylin', wildin', livin' it up in the city"},{t:31,x:"Got Chucks on with Saint Laurent"},{t:36,x:"Gotta kiss myself I'm so pretty"},{t:41,x:"I'm too hot, call the police and the fireman"},{t:48,x:"I'm too hot, make a dragon wanna retire man"},{t:55,x:"Uptown funk you up, uptown funk you up"},{t:62,x:"Saturday night and we in the spot"},{t:68,x:"Don't believe me, just watch!"},{t:74,x:"Uptown funk gonna give it to ya"},{t:80,x:"Don't believe me, just watch!"}]
+  }
+];
+
+let cur=0, playing=false, elapsed=0, ticker=null;
+let miniExpanded=false, shuffleOn=false, loopOn=true;
+let order=SONGS.map((_,i)=>i);
+let ytPlayer=null, ytReady=false;
+
+// ── YouTube IFrame API ──
+function onYouTubeIframeAPIReady() {
+  ytPlayer = new YT.Player('yt-player', {
+    height:'200', width:'300',
+    videoId: SONGS[0].yt,
+    playerVars:{ autoplay:0, controls:1, rel:0, modestbranding:1 },
+    events:{
+      onReady: ()=>{ ytReady=true; },
+      onStateChange: (e)=>{
+        if(e.data===YT.PlayerState.ENDED){ elapsed=0; nextSong(); }
+        if(e.data===YT.PlayerState.PLAYING && !playing){ playing=true; startTicker(); updatePlayBtns(); }
+        if(e.data===YT.PlayerState.PAUSED && playing){ playing=false; stopTicker(); updatePlayBtns(); }
+      }
+    }
+  });
+}
+
+buildSidebar();
+updateMiniBar();
+
+function buildSidebar(){
+  const el=document.getElementById('song-list');
+  el.innerHTML='';
+  SONGS.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='song-item'+(i===cur?' active':'');
+    d.innerHTML=`<div class="song-num">${i===cur&&playing?'▶':i+1}</div>
+      <div class="song-details"><div class="song-name">${s.title}</div><div class="song-artist">${s.artist}</div></div>
+      <div class="song-dur">${fmt(s.duration)}</div>`;
+    d.onclick=()=>{ cur=i; elapsed=0; loadSong(false); };
+    el.appendChild(d);
+  });
+}
+
+function fmt(s){ return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`; }
+
+function loadSong(autoplay){
+  const s=SONGS[cur];
+  document.getElementById('album-art').textContent=s.emoji;
+  document.getElementById('album-art').classList.toggle('spinning',autoplay);
+  document.getElementById('now-title').textContent=s.title;
+  document.getElementById('now-artist').textContent=s.artist;
+  document.getElementById('t-tot').textContent=fmt(s.duration);
+  document.getElementById('t-cur').textContent='0:00';
+  document.getElementById('progress-fill').style.width='0%';
+  document.getElementById('mini-prog').style.width='0%';
+  // Load background video (muted)
+  document.getElementById('yt-bg').src=
+    `https://www.youtube.com/embed/${s.yt}?autoplay=1&mute=1&controls=0&loop=1&playlist=${s.yt}&rel=0&showinfo=0`;
+  document.getElementById('video-bg-wrap').classList.add('visible');
+  // Load audio player
+  if(ytReady){
+    if(autoplay){ ytPlayer.loadVideoById(s.yt); }
+    else { ytPlayer.cueVideoById(s.yt); }
+  }
+  buildLyrics();
+  buildSidebar();
+  updateMiniBar();
+  stopTicker();
+  if(autoplay){ playing=true; startTicker(); }
+  else { playing=false; }
+  updatePlayBtns();
+  // Refresh PiP iframe if active
+  if(pipOn){
+    const pipIframe=document.getElementById('yt-pip');
+    pipIframe.src=`https://www.youtube.com/embed/${SONGS[cur].yt}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+  }
+}
+
+function updateMiniBar(){
+  const s=SONGS[cur];
+  document.getElementById('mini-thumb').textContent=s.emoji;
+  document.getElementById('mini-title').textContent=s.title;
+  document.getElementById('mini-art-name').textContent=s.artist;
+}
+
+function togglePlay(){
+  if(!ytReady){ alert('Player loading, please wait a moment!'); return; }
+  if(playing){ ytPlayer.pauseVideo(); }
+  else { ytPlayer.playVideo(); }
+}
+
+function updatePlayBtns(){
+  const icon=playing?'⏸':'▶';
+  document.getElementById('play-btn').textContent=icon;
+  document.getElementById('mini-play-btn').textContent=icon;
+  document.getElementById('album-art').classList.toggle('spinning',playing);
+  buildSidebar();
+}
+
+function startTicker(){
+  clearInterval(ticker);
+  ticker=setInterval(tick, 500);
+}
+function stopTicker(){ clearInterval(ticker); }
+
+function tick(){
+  if(ytReady && ytPlayer.getCurrentTime){ elapsed=ytPlayer.getCurrentTime()||0; }
+  else { elapsed+=0.5; }
+  const s=SONGS[cur];
+  const pct=Math.min((elapsed/s.duration)*100,100).toFixed(2);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('mini-prog').style.width=pct+'%';
+  document.getElementById('t-cur').textContent=fmt(elapsed);
+  if(miniExpanded) scrollLyrics();
+}
+
+function seekTo(e){
+  const bar=document.getElementById('progress-bar');
+  const r=bar.getBoundingClientRect();
+  elapsed=((e.clientX-r.left)/r.width)*SONGS[cur].duration;
+  if(ytReady) ytPlayer.seekTo(elapsed,true);
+  tick();
+}
+
+function nextSong(){
+  elapsed=0;
+  const idx=order.indexOf(cur);
+  cur=order[(idx+1)%order.length];
+  loadSong(playing);
+}
+
+function prevSong(){
+  elapsed=0;
+  if(ytReady && ytPlayer.getCurrentTime && ytPlayer.getCurrentTime()>3){
+    ytPlayer.seekTo(0,true); elapsed=0; return;
+  }
+  const idx=order.indexOf(cur);
+  cur=order[(idx-1+order.length)%order.length];
+  loadSong(playing);
+}
+
+function toggleShuffle(){
+  shuffleOn=!shuffleOn;
+  document.getElementById('shuf-btn').classList.toggle('on',shuffleOn);
+  order=shuffleOn?[...SONGS.keys()].sort(()=>Math.random()-0.5):SONGS.map((_,i)=>i);
+}
+
+function toggleLoop(){
+  loopOn=!loopOn;
+  document.getElementById('loop-btn').classList.toggle('on',loopOn);
+}
+
+// ── MINIPLAYER ──
+function toggleMiniplayer(){
+  miniExpanded=!miniExpanded;
+  const mp=document.getElementById('miniplayer');
+  const btn=document.getElementById('mini-toggle');
+  mp.classList.toggle('collapsed',!miniExpanded);
+  btn.textContent=miniExpanded?'Close ▼':'Lyrics ▲';
+  if(miniExpanded){ buildLyrics(); scrollLyrics(); }
+}
+
+// ── PICTURE IN PICTURE ──
+let pipOn=false;
+function togglePiP(){
+  pipOn=!pipOn;
+  const wrap=document.getElementById('pip-iframe-wrap');
+  const pipIframe=document.getElementById('yt-pip');
+  const btn=document.getElementById('pip-btn');
+  if(pipOn){
+    const s=SONGS[cur];
+    // Load the current song into the PiP iframe with controls visible
+    pipIframe.src=`https://www.youtube.com/embed/${s.yt}?autoplay=1&controls=1&rel=0&modestbranding=1&start=${Math.floor(elapsed)}`;
+    wrap.style.display='block';
+    btn.textContent='⧉ Close PiP';
+    btn.classList.add('active');
+    // Try browser native PiP on the iframe's internal video
+    pipIframe.addEventListener('load', ()=>{
+      try {
+        pipIframe.contentWindow.document.querySelector('video')?.requestPictureInPicture?.();
+      } catch(e){}
+    }, {once:true});
+  } else {
+    wrap.style.display='none';
+    pipIframe.src='';
+    btn.textContent='⧉ PiP';
+    btn.classList.remove('active');
+    if(document.pictureInPictureElement){
+      document.exitPictureInPicture().catch(()=>{});
+    }
+  }
+}
+
+// ── LYRICS ──
+function buildLyrics(){
+  const scroll=document.getElementById('lyrics-scroll');
+  const lines=SONGS[cur].lyrics;
+  scroll.innerHTML=lines.map((l,i)=>
+    `<div class="lyric-line${l.inst?' inst':''}" data-i="${i}">${l.x}</div>`
+  ).join('');
+  scroll.style.transform='translateY(0)';
+}
+
+function scrollLyrics(){
+  const lines=SONGS[cur].lyrics;
+  let active=0;
+  for(let i=0;i<lines.length;i++){ if(elapsed>=lines[i].t) active=i; }
+  document.querySelectorAll('.lyric-line').forEach((el,i)=>{
+    el.classList.remove('active','near');
+    if(i===active) el.classList.add('active');
+    else if(Math.abs(i-active)===1) el.classList.add('near');
+  });
+  const scroll=document.getElementById('lyrics-scroll');
+  const inner=scroll.closest('.lyrics-inner');
+  const activEl=scroll.querySelector('.lyric-line.active');
+  if(activEl){
+    const offset=activEl.offsetTop-inner.clientHeight/2+activEl.clientHeight/2;
+    scroll.style.transform=`translateY(${-Math.max(0,offset)}px)`;
+  }
+}
+</script>
+</body>
+</html>

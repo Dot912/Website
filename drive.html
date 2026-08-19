@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Night Music</title>
+    <link rel="icon" href="wabilogo.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        :root{--color-background:#000000;--color-text-primary:#FFFFFF;--color-accent-white:#FFFFFF;--color-accent-blue:#00FFFF;--color-subtle-border:#1A1A1A;--color-success:#00FF00;--color-error:#FF0000;--font-stack:'Inconsolata',monospace}
+        .hacked-mode{--color-accent-white:var(--color-accent-blue)}
+        .lockout-mode .logo-text{display:none!important}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body,html{height:100%;overflow:hidden;font-family:var(--font-stack);background-color:black;color:var(--color-text-primary)}
+        #background-element{position:fixed;top:0;left:0;width:100%;height:100%;background-image:url('Initial.png');background-size:cover;background-position:center;filter:brightness(0.7) contrast(1.1) blur(0px);transition:opacity 1s ease-in-out,filter 0.25s ease-out;z-index:1}
+        #video-bg{position:fixed;top:0;left:0;min-width:100%;min-height:100%;object-fit:cover;opacity:0;transition:opacity 1s ease-in-out;z-index:0}
+        .blur-start #background-element{filter:brightness(0.7) contrast(1.1) blur(15px)}
+        .video-active #video-bg{opacity:1}
+        .video-active #background-element{opacity:0}
+        #landing-ui{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;transition:opacity 0.5s ease-in-out,visibility 0.5s}
+        #landing-ui.hidden{opacity:0;visibility:hidden;pointer-events:none}
+        .landing-logo{position:absolute;top:30px;right:50px;cursor:pointer;transition:transform 0.3s ease}
+        .landing-logo img{width:60px;height:60px;border-radius:50%;object-fit:cover}
+        .landing-logo:hover{transform:scale(1.1)}
+        .landing-nav{position:absolute;bottom:50px;right:50px;display:flex;flex-direction:column;gap:15px;align-items:flex-end}
+        .landing-link{text-decoration:none;color:var(--color-text-primary);font-size:1.8rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;transition:all 0.3s ease;text-shadow:0 0 5px rgba(255,255,255,0.4);cursor:pointer}
+        .landing-link:hover{transform:scale(1.1) translateX(-8px);color:var(--color-accent-white);text-shadow:0 0 10px var(--color-accent-white)}
+        #initial-play{background:none;border:none;color:var(--color-text-primary);font-size:1.1rem;padding:0;cursor:pointer;margin-right:5px;transition:all 0.3s ease;text-shadow:0 0 5px rgba(255,255,255,0.5)}
+        #initial-play:hover{transform:scale(1.2);text-shadow:0 0 15px var(--color-text-primary)}
+        #volume-controls{display:flex;align-items:center;gap:10px;margin-top:5px;opacity:0;transition:opacity 0.5s ease-in-out}
+        #volume-slider{-webkit-appearance:none;appearance:none;width:100px;height:5px;background:var(--color-text-primary);cursor:pointer;box-shadow:0 0 5px rgba(255,255,255,0.5);opacity:0.8;border-radius:2px}
+        #volume-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--color-text-primary);box-shadow:0 0 8px rgba(255,255,255,0.8);transition:background 0.2s}
+        #volume-slider::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--color-text-primary);border:none;box-shadow:0 0 8px rgba(255,255,255,0.8)}
+        #play-pause-icon{color:var(--color-text-primary);cursor:pointer;font-size:1.1rem;text-shadow:0 0 5px rgba(255,255,255,0.5);transition:transform 0.3s}
+        #drive-content-ui{position:absolute;top:0;left:0;width:100%;height:100%;z-index:20;overflow-y:auto;background:rgba(0,0,0,0.85);opacity:0;visibility:hidden;pointer-events:none;transition:opacity 0.8s ease-in-out,visibility 0.8s;scroll-behavior:smooth}
+        #drive-content-ui.active{opacity:1;visibility:visible;pointer-events:auto}
+        .navbar{background-color:rgba(0,0,0,0.95);border-bottom:1px solid var(--color-accent-white);padding:20px 50px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000}
+        .logo-text{font-size:1.5rem;font-weight:700;color:var(--color-accent-blue);text-decoration:none;text-shadow:0 0 5px var(--color-accent-blue);cursor:pointer;transition:color 0.3s,text-shadow 0.3s}
+        .logo-text:hover{color:var(--color-accent-white);text-shadow:0 0 10px var(--color-accent-white)}
+        .nav-items a{color:var(--color-text-primary);text-decoration:none;margin-left:25px;transition:color 0.3s,text-shadow 0.3s}
+        .nav-items a:hover{color:var(--color-accent-white);text-shadow:0 0 5px var(--color-accent-white)}
+        .content-wrapper{max-width:900px;margin:0 auto;padding:80px 20px}
+        .section{padding:60px 0;border-bottom:1px solid var(--color-subtle-border);display:none}
+        .section.active-section{display:block;animation:flicker 0.5s}
+        .main-heading{font-size:3rem;font-weight:700;text-shadow:0 0 15px rgba(255,255,255,0.6);margin-bottom:20px}
+        .sub-heading{font-size:1.8rem;color:var(--color-accent-white);text-transform:uppercase;margin-bottom:30px;border-left:3px solid var(--color-accent-white);padding-left:15px;transition:all 0.3s}
+        .skills-list{list-style:none;display:flex;flex-direction:row;flex-wrap:wrap;gap:15px;margin-top:20px}
+        .skills-list li{background:#1A1A1A;padding:10px 20px;border:1px solid #333;border-radius:4px;cursor:pointer;transition:all 0.3s ease}
+        .skills-list li:hover{background:var(--color-accent-white);color:black;transform:scale(1.05);box-shadow:0 0 10px var(--color-accent-white)}
+        .timeline-container{position:relative;padding:20px 0 20px 25px}
+        .timeline-container::before{content:'';position:absolute;top:0;left:10px;width:2px;height:100%;background-color:#333}
+        .timeline-stop{position:relative;margin-bottom:40px;padding-left:30px;transition:all 0.3s}
+        .stop-dot{width:12px;height:12px;background:var(--color-background);border:2px solid var(--color-accent-white);border-radius:50%;position:absolute;left:5px;top:5px;box-shadow:0 0 5px rgba(255,255,255,0.3);transition:all 0.3s}
+        .timeline-stop:hover .stop-dot{transform:scale(1.3);background:var(--color-accent-white);box-shadow:0 0 15px var(--color-accent-white)}
+        .timeline-stop.current .stop-dot{width:16px;height:16px;left:3px;background:var(--color-accent-white);border:2px solid var(--color-accent-blue);box-shadow:0 0 10px var(--color-accent-white),0 0 20px var(--color-accent-blue);animation:pulse-dot 2s infinite ease-in-out}
+        @keyframes pulse-dot{0%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:0.8}100%{transform:scale(1);opacity:1}}
+        .stop-content h3{font-size:1.4rem;color:var(--color-accent-white);margin-bottom:5px;transition:all 0.3s}
+        .timeline-stop.end-point{margin-bottom:0}
+        .contact-form input,.contact-form textarea{width:100%;padding:10px;margin-top:5px;margin-bottom:20px;background:black;border:1px solid var(--color-accent-white);color:var(--color-text-primary);font-family:var(--font-stack);transition:all 0.3s}
+        .contact-form input:focus,.contact-form textarea:focus{outline:none;border-color:var(--color-accent-blue);box-shadow:0 0 10px rgba(0,255,255,0.3)}
+        .contact-form button{background:var(--color-accent-white);color:black;border:none;padding:12px 25px;font-weight:700;cursor:pointer;text-transform:uppercase;transition:all 0.3s}
+        .contact-form button:hover{background:#DEDEDE;transform:translateY(-2px);box-shadow:0 4px 15px rgba(255,255,255,0.3)}
+        .hacked-mode .contact-form button{box-shadow:0 0 10px var(--color-accent-blue)}
+        #hack-game-area{background:#0d0d0d;border:2px solid var(--color-accent-blue);padding:20px;border-radius:4px;box-shadow:0 0 20px rgba(0,255,255,0.4)}
+        #code-display{font-size:1.5rem;letter-spacing:5px;text-align:center;padding:15px 0;margin-bottom:20px;color:var(--color-success);text-shadow:0 0 5px var(--color-success);font-weight:700}
+        .code-input-container{display:flex;justify-content:center;gap:10px;margin-bottom:20px}
+        .code-input-digit{width:40px;height:50px;font-size:2rem;text-align:center;background:black;border:1px solid var(--color-accent-blue);color:var(--color-text-primary);font-family:var(--font-stack);caret-color:var(--color-accent-blue);transition:all 0.3s}
+        .code-input-digit:focus{outline:none;box-shadow:0 0 15px var(--color-accent-blue)}
+        #game-message{text-align:center;min-height:25px;font-size:1.1rem;color:var(--color-text-primary)}
+        .game-status-success{color:var(--color-success);text-shadow:0 0 8px var(--color-success)}
+        .game-status-error{color:var(--color-error);text-shadow:0 0 8px var(--color-error)}
+        .hack-button{display:block;width:100%;background:var(--color-accent-blue);color:black;border:none;padding:12px 25px;font-weight:700;cursor:pointer;text-transform:uppercase;transition:all 0.3s}
+        .hack-button:hover{background:var(--color-accent-white);transform:translateY(-2px);box-shadow:0 4px 15px rgba(0,255,255,0.5)}
+        #datetime-display{position:fixed;bottom:20px;left:20px;font-size:0.9rem;color:var(--color-text-primary);text-shadow:0 0 5px rgba(255,255,255,0.5);z-index:100;opacity:0.8;transition:all 0.3s}
+        #datetime-display:hover{opacity:1;text-shadow:0 0 10px var(--color-accent-white)}
+        .typewriter{overflow:hidden;border-right:2px solid var(--color-accent-white);white-space:nowrap;animation:typing 3s steps(50) forwards,blink 0.75s step-end infinite}
+        @keyframes typing{from{width:0}to{width:100%}}
+        @keyframes blink{50%{border-color:transparent}}
+        @keyframes flicker{0%{opacity:0}100%{opacity:1}}
+    </style>
+</head>
+<body id="site-body">
+    <div id="background-element"></div>
+    <video muted id="video-bg" playsinline></video>
+    <audio id="background-audio" loop><source src="your_song.mp3" type="audio/mp3"></audio>
+    <div id="datetime-display"></div>
+
+    <div id="landing-ui">
+        <div class="landing-logo" onclick="enterDriveMode()"><img src="wabilogo.png" alt="Enter Drive"></div>
+        <div class="landing-nav">
+            <a class="landing-link" onclick="enterDriveMode('skills')">Artist</a>
+            <a class="landing-link" onclick="enterDriveMode('experience')">Genre</a>
+            <button id="initial-play" aria-label="Start Music and Video">▶︎</button>
+            <div id="volume-controls">
+                <span id="play-pause-icon" class="material-icons">pause</span>
+                <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5">
+            </div>
+        </div>
+    </div>
+
+    <div id="drive-content-ui">
+        <header class="navbar">
+            <div class="logo-text" onclick="showSection('mini-game')">DRIVE.</div>
+            <nav class="nav-items">
+                <a href="#" onclick="showSection('skills')">Interests</a>
+                <a href="#" onclick="showSection('experience')">History</a>
+                <a href="#" onclick="showSection('projects')">Creations</a>
+                <a href="#" onclick="showSection('contact')">Contact</a>
+            </nav>
+        </header>
+
+        <div class="content-wrapper">
+            <section id="intro-section" class="section">
+                <h1 class="main-heading">Night Shift Operations</h1>
+                <p class="typewriter" id="intro-text"></p>
+            </section>
+
+            <section id="skills" class="section">
+                <h2 class="sub-heading">FILE: Artist Data // Core Streams</h2>
+                <p>Primary interests and media consumption logs.</p>
+                <ul class="skills-list">
+                    <li>Synthwave</li><li>Retro Gaming</li><li>Visual Design</li><li>Night Drives</li>
+                </ul>
+            </section>
+
+            <section id="experience" class="section">
+                <h2 class="sub-heading">FILE: Genre Logs // Historical Archive</h2>
+                <p>Key moments and data processing milestones on the night highway.</p>
+                <div class="timeline-container">
+                    <div class="timeline-stop current">
+                        <div class="stop-dot"></div>
+                        <div class="stop-content">
+                            <h3>2025 // Current Stream</h3>
+                            <p>Exploring new frequencies and optimizing data flow. Active operations initiated.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-stop">
+                        <div class="stop-dot"></div>
+                        <div class="stop-content">
+                            <h3>2024 // Data Synthesis</h3>
+                            <p>Initial framework construction and hardware integration. Synth sound library established.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-stop">
+                        <div class="stop-dot"></div>
+                        <div class="stop-content">
+                            <h3>2022 // Pilot Program</h3>
+                            <p>First frequency transmissions sent. Establishing base protocols and neon aesthetic.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-stop end-point">
+                        <div class="stop-dot"></div>
+                        <div class="stop-content">
+                            <h3>2020 // Archive Initialization</h3>
+                            <p>System start-up and core file indexing complete. Origin point on the timeline.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="projects" class="section">
+                <h2 class="sub-heading">FILE: Creations // Output Files</h2>
+                <p>Featured projects and visual archives.</p>
+                <ul class="skills-list">
+                    <li>Mixtape_Vol_I.mp3</li><li>Neon_Visualizer.exe</li><li>Concept_Art_1.png</li>
+                </ul>
+            </section>
+
+            <section id="hacked-files" class="section">
+                <h2 class="sub-heading">FILE: System Files // Restricted Data Stream</h2>
+                <p>DATA BREACH CONFIRMED. Accessing hidden logs and deeper archives.</p>
+                <ul class="skills-list">
+                    <li>Deep Web Frequencies</li><li>Cipher Decryption Protocols</li><li>Exotic Materials Inventory</li><li>Zero-day Exploits Log</li>
+                </ul>
+            </section>
+
+            <section id="contact" class="section">
+                <h2 class="sub-heading">CONNECTION // Secure Data Transfer</h2>
+                <p>Initiate secure transmission protocol.</p>
+                <form class="contact-form" action="https://formspree.io/f/xkowvrne" method="POST">
+                    <input type="text" name="name" placeholder="Alias" required>
+                    <input type="email" name="email" placeholder="Frequency (Email)" required>
+                    <textarea name="message" placeholder="Transmission Message" rows="5" required></textarea>
+                    <button type="submit">Send</button>
+                </form>
+            </section>
+
+            <section id="mini-game" class="section">
+                <h2 class="sub-heading">TERMINAL ACCESS // AUTHORIZATION REQUIRED</h2>
+                <div id="hack-game-area">
+                    <p>Enter the 4-digit sequence to gain system access.</p>
+                    <div id="code-display">_ _ _ _</div>
+                    <div class="code-input-container">
+                        <input type="text" maxlength="1" class="code-input-digit" id="digit1" inputmode="numeric">
+                        <input type="text" maxlength="1" class="code-input-digit" id="digit2" inputmode="numeric">
+                        <input type="text" maxlength="1" class="code-input-digit" id="digit3" inputmode="numeric">
+                        <input type="text" maxlength="1" class="code-input-digit" id="digit4" inputmode="numeric">
+                    </div>
+                    <p id="game-message">ATTEMPT 1/5</p>
+                    <button class="hack-button" onclick="checkCode()">Authorize</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const body=document.getElementById('site-body'),playBtn=document.getElementById('initial-play'),video=document.getElementById('video-bg'),audio=document.getElementById('background-audio'),imageBg=document.getElementById('background-element'),landingUI=document.getElementById('landing-ui'),driveUI=document.getElementById('drive-content-ui'),volumeControls=document.getElementById('volume-controls'),slider=document.getElementById('volume-slider'),icon=document.getElementById('play-pause-icon'),dateTimeDisplay=document.getElementById('datetime-display');
+        let isPlaying=false,hasStarted=false,hackSuccess=sessionStorage.getItem('hackStatus')==='true',correctCode='1439',attempts=0,maxAttempts=5,currentVideoName='background.mp4',konamiCode=[],konamiSequence=['ArrowUp','ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowDown','w'];
+        
+        const codeDigits=document.querySelectorAll('.code-input-digit'),codeDisplay=document.getElementById('code-display'),gameMessage=document.getElementById('game-message');
+
+        function updateDateTime(){const now=new Date(),options={weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'};dateTimeDisplay.textContent=now.toLocaleString('en-US',options)}
+        setInterval(updateDateTime,1000);updateDateTime();
+
+        function typeWriter(element,text,speed=50){let i=0;element.textContent='';const type=()=>{if(i<text.length){element.textContent+=text.charAt(i);i++;setTimeout(type,speed)}else{element.style.borderRight='none'}};type()}
+
+        function initializeGame(){if(hackSuccess){body.classList.add('hacked-mode');updateGameUI('SUCCESS')}else{updateGameUI(null)}correctCode='1439';attempts=0;codeDigits.forEach(input=>input.value='')}
+
+        function updateGameUI(status){codeDigits.forEach(input=>input.disabled=(status==='SUCCESS'));if(status==='SUCCESS'){codeDisplay.textContent='ACCESS GRANTED';gameMessage.textContent='System Hacked. Neon Files Unlocked.';gameMessage.className='game-status-success';body.classList.add('hacked-mode');sessionStorage.setItem('hackStatus','true');hackSuccess=true;if(driveUI.classList.contains('active')){setTimeout(()=>showSection('hacked-files'),1000)}}else if(status==='FAIL'){gameMessage.textContent=`CODE DENIED. ATTEMPT ${attempts}/${maxAttempts}`;gameMessage.className='game-status-error'}else{codeDisplay.textContent='_ _ _ _';gameMessage.textContent=`ATTEMPT ${attempts}/${maxAttempts}`;gameMessage.className=''}}
+
+        window.checkCode=function(){if(hackSuccess){gameMessage.textContent='HACK STATUS: AUTHORIZED';return}if(attempts>=maxAttempts)return;const enteredCode=Array.from(codeDigits).map(input=>input.value).join('');if(enteredCode.length!==4){gameMessage.textContent='Enter all 4 digits.';gameMessage.className='game-status-error';return}attempts++;if(enteredCode===correctCode){updateGameUI('SUCCESS')}else{let correctCount=0,codeArray=correctCode.split(''),enteredArray=enteredCode.split('');for(let i=0;i<4;i++){if(codeArray.includes(enteredArray[i])){correctCount++;codeArray[codeArray.indexOf(enteredArray[i])]=null}}updateGameUI('FAIL');gameMessage.textContent+=` (${correctCount} digit${correctCount!==1?'s':''} correct)`;if(attempts>=maxAttempts){codeDisplay.textContent='LOCKED';gameMessage.textContent='LOCKOUT: Maximum attempts reached. Drive mode disabled.';body.classList.add('lockout-mode')}else{codeDigits.forEach(input=>input.value='');document.getElementById('digit1').focus()}}}
+
+        codeDigits.forEach((input,index)=>{input.addEventListener('input',e=>{e.target.value=e.target.value.replace(/[^0-9]/g,'').slice(0,1);if(e.target.value.length===1&&index<codeDigits.length-1){codeDigits[index+1].focus()}});input.addEventListener('keydown',e=>{if(e.key==='Backspace'&&e.target.value===''&&index>0){codeDigits[index-1].focus()}})});
+
+        async function playVideoSafe(){try{await video.play();isPlaying=true;icon.textContent='pause'}catch(err){console.log("Video play prevented:",err)}}
+
+        function handleVideoEnd(){if(currentVideoName==='background.mp4'){currentVideoName='Drive.mp4';video.src='Drive.mp4'}else{currentVideoName='background.mp4';video.src='background.mp4'}video.loop=false;video.load();playVideoSafe()}
+
+        video.addEventListener('ended',handleVideoEnd);document.addEventListener("visibilitychange",()=>{if(!document.hidden&&hasStarted&&video.paused){playVideoSafe()}});
+
+        playBtn.addEventListener('click',()=>{if(hasStarted)return;hasStarted=true;isPlaying=true;body.classList.add('blur-start');video.muted=false;currentVideoName='background.mp4';video.src='background.mp4';video.loop=false;video.load();playVideoSafe();audio.play().catch(e=>console.log(e));audio.volume=slider.value;setTimeout(()=>{body.classList.add('video-active')},250);setTimeout(()=>{volumeControls.style.opacity=1;imageBg.remove()},1000);playBtn.style.display='none'});
+
+        window.enterDriveMode=function(targetSectionId=null){landingUI.classList.add('hidden');driveUI.classList.add('active');let defaultTarget;if(targetSectionId){defaultTarget=targetSectionId}else if(hackSuccess){defaultTarget='hacked-files'}else{defaultTarget='intro-section'}showSection(defaultTarget)}
+
+        window.exitDriveMode=function(){landingUI.classList.remove('hidden');driveUI.classList.remove('active')}
+
+        driveUI.addEventListener('click',e=>{const target=e.target;const isInteractive=element=>{if(!element||element===driveUI)return false;if(element.tagName==='A'||element.tagName==='BUTTON'||element.tagName==='INPUT'||element.tagName==='TEXTAREA'||element.classList.contains('skills-list')||element.parentElement.classList.contains('skills-list')||element.closest('.navbar')){return true}return isInteractive(element.parentElement)};if(!isInteractive(target)){exitDriveMode()}});
+
+        window.showSection=function(id){if(id==='hacked-files'&&!hackSuccess)return;if(id==='mini-game'){if(attempts>=maxAttempts&&!hackSuccess){gameMessage.textContent='ACCESS DENIED. Terminal locked.';return}if(hackSuccess){gameMessage.textContent='STATUS: AUTHORIZED'}}document.querySelectorAll('.section').forEach(s=>s.classList.remove('active-section'));const target=document.getElementById(id);if(target){target.classList.add('active-section');if(id==='intro-section'){const introText=document.getElementById('intro-text');typeWriter(introText,'System Online. Navigation controls active. Select a data stream.',40)}}driveUI.scrollTo({top:0,behavior:'smooth'})}
+
+        slider.addEventListener('input',e=>audio.volume=e.target.value);icon.addEventListener('click',()=>{if(isPlaying){audio.pause();video.pause();icon.textContent='play_arrow';isPlaying=false}else{audio.play();playVideoSafe();icon.textContent='pause';isPlaying=true}});
+
+        document.addEventListener('keydown',e=>{konamiCode.push(e.key);if(konamiCode.length>konamiSequence.length){konamiCode.shift()}if(JSON.stringify(konamiCode)===JSON.stringify(konamiSequence)){window.open('https://omotenashi.nekoweb.org','_blank');konamiCode=[]}});
+
+        document.addEventListener('DOMContentLoaded',()=>{initializeGame();currentVideoName='background.mp4';video.src='background.mp4';video.loop=false;video.load();if(hackSuccess){showSection('hacked-files')}else{showSection('intro-section')}});
+    </script>
+</body>
+</html>
