@@ -92,6 +92,13 @@
         .landing-link { text-decoration:none; color:var(--color-text-primary); font-size:1.6rem; font-weight:700; text-transform:uppercase; letter-spacing:4px; transition:all 0.3s ease; text-shadow:0 0 5px rgba(255,255,255,0.3); cursor:pointer; font-family:var(--font-heading); }
         .landing-link:hover { transform:scale(1.1) translateX(-8px); color:var(--color-accent-white); text-shadow:0 0 14px var(--color-accent-white) }
 
+        #initial-play { display: none !important; }
+        #volume-controls { display: none !important; }
+        #volume-slider { -webkit-appearance:none; appearance:none; width:100px; height:5px; background:var(--color-text-primary); cursor:pointer; box-shadow:0 0 5px rgba(255,255,255,0.5); opacity:0.8; border-radius:2px }
+        #volume-slider::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:var(--color-text-primary); box-shadow:0 0 8px rgba(255,255,255,0.8); transition:background 0.2s }
+        #volume-slider::-moz-range-thumb { width:12px; height:12px; border-radius:50%; background:var(--color-text-primary); border:none; box-shadow:0 0 8px rgba(255,255,255,0.8) }
+        #play-pause-icon { color:var(--color-text-primary); cursor:pointer; font-size:1.1rem; text-shadow:0 0 5px rgba(255,255,255,0.5); transition:transform 0.3s }
+
         #drive-content-ui { position:absolute; top:0; left:0; width:100%; height:100%; z-index:20; overflow-y:auto; background:rgba(0,0,0,0.85); opacity:0; visibility:hidden; pointer-events:none; transition:opacity 0.8s ease-in-out, visibility 0.8s; scroll-behavior:smooth }
         #drive-content-ui.active { opacity:1; visibility:visible; pointer-events:auto }
 
@@ -1061,6 +1068,87 @@
         #reboot-overlay.fade-out { opacity: 0; }
         #reboot-lines { }
 
+        /* ===================== MOOD CONFIRM DIALOG ===================== */
+        #mood-confirm-overlay {
+            display: none;
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.88);
+            z-index: 9500;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(3px);
+        }
+        #mood-confirm-overlay.active { display: flex; animation: flicker 0.2s; }
+        .mood-confirm-box {
+            border: 1px solid var(--color-accent-blue);
+            background: #030308;
+            padding: 36px 44px;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.9), 0 0 20px rgba(0,255,255,0.06);
+            transition: border-color 0.5s;
+        }
+        .mood-confirm-box::before {
+            content: '';
+            position: absolute; top:0; left:0; right:0; height:1px;
+            background: linear-gradient(90deg, transparent, var(--color-accent-blue), transparent);
+        }
+        .mood-confirm-eyebrow {
+            font-size: 0.48rem; letter-spacing: 4px;
+            color: #333; text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .mood-confirm-title {
+            font-size: 1.1rem; font-weight: 700;
+            color: var(--color-accent-blue);
+            text-shadow: 0 0 10px var(--color-accent-blue);
+            letter-spacing: 3px; text-transform: uppercase;
+            margin-bottom: 6px;
+            transition: color 0.5s, text-shadow 0.5s;
+        }
+        .mood-confirm-sub {
+            font-size: 0.58rem; color: #333;
+            letter-spacing: 2px; margin-bottom: 26px;
+            line-height: 1.8;
+        }
+        .mood-confirm-sub strong { color: #555; }
+        .mood-confirm-warn {
+            font-size: 0.52rem; color: #ffcc0088;
+            letter-spacing: 2px; margin-bottom: 22px;
+        }
+        .mood-confirm-btns {
+            display: flex; gap: 10px;
+        }
+        .mood-confirm-yes {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--color-accent-blue);
+            color: var(--color-accent-blue);
+            font-family: var(--font-stack);
+            font-size: 0.65rem; letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .mood-confirm-yes:hover {
+            background: rgba(0,255,255,0.07);
+            box-shadow: 0 0 12px rgba(0,255,255,0.2);
+        }
+        .mood-confirm-no {
+            flex: 1;
+            background: transparent;
+            border: 1px solid #222;
+            color: #444;
+            font-family: var(--font-stack);
+            font-size: 0.65rem; letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .mood-confirm-no:hover { border-color: #555; color: #666; }
+
         /* ===================== MUSIC PLAYER SECTION ===================== */
         #music-section { }
         .music-back { padding: 30px 0 10px; }
@@ -1571,6 +1659,161 @@
                         radial-gradient(ellipse at 70% 20%, rgba(255,120,200,0.12) 0%, rgba(0,0,0,0) 60%);
         }
 
+        /* ===================== MOOD CONFIRM + MINI REBOOT ===================== */
+        #mood-confirm-overlay {
+            display: none;
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.88);
+            z-index: 9200;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(6px);
+        }
+        #mood-confirm-overlay.active { display: flex; animation: flicker 0.2s; }
+        .mood-confirm-box {
+            border: 1px solid var(--color-accent-blue);
+            background: #030308;
+            padding: 36px 44px;
+            max-width: 400px; width: 90%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9), 0 0 20px rgba(0,255,255,0.06);
+        }
+        .mood-confirm-box::before {
+            content: '';
+            position: absolute; top:0; left:0; right:0; height:2px;
+            background: linear-gradient(90deg, transparent, var(--color-accent-blue), transparent);
+        }
+        .mood-confirm-label {
+            font-size: 0.5rem; letter-spacing: 4px; color: #333;
+            text-transform: uppercase; margin-bottom: 10px;
+        }
+        .mood-confirm-name {
+            font-size: 1.4rem; font-weight: 700;
+            color: var(--color-accent-blue);
+            text-shadow: 0 0 12px var(--color-accent-blue);
+            letter-spacing: 3px; text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .mood-confirm-sub {
+            font-size: 0.55rem; color: #333;
+            letter-spacing: 2px; margin-bottom: 28px;
+        }
+        .mood-confirm-btns {
+            display: flex; gap: 10px; justify-content: center;
+        }
+        .mood-confirm-yes {
+            background: var(--color-accent-blue);
+            color: #000; border: none;
+            font-family: var(--font-stack);
+            font-size: 0.65rem; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase;
+            padding: 10px 28px; cursor: pointer;
+            transition: all 0.25s;
+        }
+        .mood-confirm-yes:hover { filter: brightness(1.2); transform: translateY(-1px); }
+        .mood-confirm-no {
+            background: transparent;
+            color: #444; border: 1px solid #222;
+            font-family: var(--font-stack);
+            font-size: 0.65rem; letter-spacing: 3px;
+            text-transform: uppercase; padding: 10px 20px;
+            cursor: pointer; transition: all 0.25s;
+        }
+        .mood-confirm-no:hover { border-color: #555; color: #666; }
+
+        /* ===================== MINI REBOOT ===================== */
+        #mini-reboot {
+            display: none;
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: #000;
+            z-index: 9300;
+            padding: 60px 80px;
+            font-family: 'Inconsolata', monospace;
+        }
+        #mini-reboot.active { display: block; }
+        #mini-reboot-lines { }
+        .mr-line {
+            font-size: 0.72rem; letter-spacing: 2px;
+            text-transform: uppercase; line-height: 2.1;
+            opacity: 0; transition: opacity 0.12s ease;
+        }
+        .mr-line.visible { opacity: 1; }
+        .mr-prefix { color: #222; }
+        .mr-ok { color: #00ff88; margin-left: 10px; }
+        .mr-accent { color: var(--color-accent-blue); text-shadow: 0 0 8px var(--color-accent-blue); margin-left: 10px; }
+
+        /* ===================== MUSIC PLAYER OVERLAY ===================== */
+        #music-player-overlay {
+            display: none;
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.96);
+            z-index: 9500;
+            flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 20px;
+        }
+        #music-player-overlay.active { display: flex; animation: flicker 0.3s; }
+        .mp-close {
+            position: absolute; top: 22px; right: 30px;
+            font-size: 1.6rem; color: #333; cursor: pointer;
+            transition: color 0.2s; font-family: var(--font-stack);
+        }
+        .mp-close:hover { color: var(--color-accent-white); }
+        .mp-label {
+            font-size: 0.52rem; letter-spacing: 4px;
+            color: #333; text-transform: uppercase;
+        }
+        .mp-title {
+            font-size: 1.6rem; font-weight: 700;
+            color: var(--color-accent-white);
+            letter-spacing: 2px;
+        }
+        .mp-artist {
+            font-size: 0.7rem; color: #444;
+            letter-spacing: 3px; text-transform: uppercase;
+        }
+        .mp-frame-wrap {
+            width: min(640px, 90vw);
+            aspect-ratio: 16/9;
+            border: 1px solid #1a1a1a;
+            overflow: hidden;
+            position: relative;
+        }
+        .mp-frame-wrap iframe {
+            width: 100%; height: 100%;
+            border: none;
+        }
+        .mp-pip {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--color-accent-blue);
+            box-shadow: 0 0 8px var(--color-accent-blue);
+            animation: pulse-dot 1.4s infinite;
+        }
+        /* end-of-video prompt */
+        #mp-end-prompt {
+            display: none;
+            flex-direction: column; align-items: center; gap: 14px;
+        }
+        #mp-end-prompt.active { display: flex; }
+        .mp-end-label {
+            font-size: 0.6rem; color: #444; letter-spacing: 3px; text-transform: uppercase;
+        }
+        .mp-end-btns { display: flex; gap: 10px; }
+        .mp-end-yes {
+            background: var(--color-accent-blue); color: #000;
+            border: none; font-family: var(--font-stack); font-size: 0.62rem;
+            font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+            padding: 9px 22px; cursor: pointer; transition: filter 0.2s;
+        }
+        .mp-end-yes:hover { filter: brightness(1.2); }
+        .mp-end-no {
+            background: transparent; color: #444; border: 1px solid #222;
+            font-family: var(--font-stack); font-size: 0.62rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            padding: 9px 16px; cursor: pointer; transition: all 0.2s;
+        }
+        .mp-end-no:hover { border-color: #555; color: #666; }
+
         @keyframes fadeIn { to{opacity:1} }
 
         /* ===================== MODE SELECTOR (before boot) ===================== */
@@ -1990,11 +2233,46 @@
         </div>
     </div>
 
+    <!-- mood switch confirm dialog -->
+    <!-- music player overlay -->
+    <div id="music-player-overlay">
+        <span class="mp-close" onclick="closeMusicPlayer()">&#215;</span>
+        <div class="mp-label">// Now Transmitting</div>
+        <div class="mp-pip"></div>
+        <div class="mp-title" id="mp-song-title">Odoriko</div>
+        <div class="mp-artist" id="mp-song-artist">Vaundy</div>
+        <div class="mp-frame-wrap">
+            <iframe id="mp-yt-frame" src="about:blank" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+        <div id="mp-end-prompt">
+            <div class="mp-end-label">// Track ended — resume lofi?</div>
+            <div class="mp-end-btns">
+                <button class="mp-end-yes" onclick="resumeLofi()">Resume Lofi</button>
+                <button class="mp-end-no" onclick="closeMusicPlayer()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- mood reboot overlay (shorter version of boot, triggered on mood change) -->
     <div id="reboot-overlay">
         <div id="reboot-lines"></div>
     </div>
 
+    <!-- mood change confirm dialog -->
+    <div id="mood-confirm-overlay">
+        <div class="mood-confirm-box">
+            <div class="mood-confirm-eyebrow">// System — Aesthetic Override</div>
+            <div class="mood-confirm-title" id="mood-confirm-title">Switching Mode</div>
+            <div class="mood-confirm-sub" id="mood-confirm-sub">Switching to <strong id="mood-confirm-name"></strong> will reboot the aesthetic system and reload all visual and audio streams.</div>
+            <div class="mood-confirm-warn">// A reboot sequence will play</div>
+            <div class="mood-confirm-btns">
+                <button class="mood-confirm-yes" id="mood-confirm-yes">Confirm Shift</button>
+                <button class="mood-confirm-no" id="mood-confirm-no">Abort</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- music video popup -->
     <!-- ===================== PIP MINIPLAYER ===================== -->
     <div id="pip-player">
         <div class="pip-chrome">
@@ -2097,6 +2375,12 @@
             <a class="landing-link" onclick="enterDriveMode('skills')">Mood</a>
             <a class="landing-link" onclick="enterDriveMode('experience')">Archives</a>
         </div>
+    </div>
+    <!-- hidden refs kept for JS compatibility -->
+    <button id="initial-play" style="display:none" aria-label="Start Music and Video"></button>
+    <div id="volume-controls" style="display:none">
+        <span id="play-pause-icon" class="material-icons">pause</span>
+        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5">
     </div>
 
     <!-- ===================== DRIVE CONTENT UI ===================== -->
@@ -2716,10 +3000,14 @@
     <script>
     // ===================== CORE SITE LOGIC =====================
     const siteBody=document.getElementById('site-body'),
+          playBtn=document.getElementById('initial-play'),
           videoBg=document.getElementById('video-bg'),
           audioBg=document.getElementById('background-audio'),
           landingUI=document.getElementById('landing-ui'),
           driveUI=document.getElementById('drive-content-ui'),
+          volControls=document.getElementById('volume-controls'),
+          volSlider=document.getElementById('volume-slider'),
+          playIcon=document.getElementById('play-pause-icon'),
           dtDisplay=document.getElementById('datetime-display');
 
     let isPlaying=false,hasStarted=false,
@@ -2897,7 +3185,7 @@
             musicFrame.src = 'about:blank';
             audioBg.src = cfg.musicSrc;
             audioBg.load();
-            audioBg.volume = audioBg.volume || 0.5;
+            audioBg.volume = parseFloat(volSlider.value) || 0.5;
             audioBg.play().catch(() => {});
             updateMusicCard(mood, true);
         }
@@ -3173,11 +3461,7 @@
 
     // ===================== VIDEO / AUDIO =====================
     async function playVideoSafe(){
-        try{
-            await videoBg.play();isPlaying=true;
-            const mccBtn=document.getElementById('mcc-playpause');
-            if(mccBtn)mccBtn.innerHTML='&#9646;&#9646;';
-        }catch(e){}
+        try{await videoBg.play();isPlaying=true;playIcon.textContent='pause'}catch(e){}
     }
 
     // High Spec: Drive.mp4 loops immediately
@@ -3201,30 +3485,22 @@
         hasStarted = true; isPlaying = true;
 
         if (currentMood === 'miami') {
-            // Miami: video is queued but silent/paused — it starts on Continue
-            videoBg.muted = false;
-            videoBg.src = MOODS.miami.videoSrc;
-            videoBg.loop = true;
-            videoBg.load();
+            // Miami: no Drive.mp4, no music yet — music starts on Continue
+            videoBg.src = '';
             videoBg.pause();
-        } else if (currentMood === 'highspec') {
-            // High Spec: Drive.mp4 + music immediately
+        } else {
+            // All other modes: play Drive.mp4 + music immediately
             videoBg.muted = false;
             videoBg.src = 'Drive.mp4';
             videoBg.loop = true;
             videoBg.load();
             playVideoSafe();
             playMoodMusic(currentMood);
-        } else {
-            // Renewal / Wistful: mood-specific background video + music immediately
-            videoBg.muted = false;
-            videoBg.src = MOODS[currentMood].videoSrc;
-            videoBg.loop = true;
-            videoBg.load();
-            playVideoSafe();
-            playMoodMusic(currentMood);
         }
     }
+
+    // keep playBtn handler as stub for compatibility
+    playBtn.addEventListener('click', autoStartMedia);
 
     // ===================== NAVIGATION =====================
     window.enterDriveMode=function(target=null){
@@ -3303,6 +3579,15 @@
         },100);
     };
 
+    volSlider.addEventListener('input', e => {
+        audioBg.volume = e.target.value;
+        const mccVol = document.getElementById('mcc-vol');
+        if (mccVol) { mccVol.value = e.target.value; mccSetVol(e.target.value); }
+    });
+    playIcon.addEventListener('click',()=>{
+        if(isPlaying){audioBg.pause();videoBg.pause();playIcon.textContent='play_arrow';isPlaying=false}
+        else{audioBg.play();playVideoSafe();playIcon.textContent='pause';isPlaying=true}
+    });
     document.addEventListener('keydown',e=>{
         konamiCode.push(e.key);
         if(konamiCode.length>konamiSeq.length)konamiCode.shift();
@@ -3378,7 +3663,7 @@
         clearInterval(swTimer);swSecs=0;swDead=false;swFirst=true;
         const timerEl=document.getElementById('sw-timer');if(timerEl)timerEl.textContent='000';
         const statusEl=document.getElementById('sw-status');if(statusEl){statusEl.textContent='STANDBY';statusEl.style.color='';}
-        const overlayEl=document.getElementById('sw-overlay');if(overlayEl){overlayEl.style.display='none';overlayEl.classList.remove('sw-overlay-anim');}
+        const overlayEl=document.getElementById('sw-overlay');if(overlayEl)overlayEl.style.display='none';
         if(swMode==='hormuz'){
             swRows=HORMUZ_ROWS;swCols=HORMUZ_COLS;swMines=HORMUZ_MINES;
             swVoid=Array.from({length:swRows},(_,r)=>Array.from({length:swCols},(_,c)=>HORMUZ_MAP[r][c]==='0'));
@@ -3821,7 +4106,7 @@
     window.playSong = function(idx) {
         const song = SONGS[idx];
         currentSong = idx;
-        preMusicVolume = audioBg.volume || 0.5;
+        preMusicVolume = audioBg.volume || parseFloat(volSlider.value);
 
         // silence background audio
         audioBg.pause();
@@ -4470,8 +4755,7 @@
             mw.style.opacity = '';
             mw.style.transition = '';
         }, 500);
-        // Start Miami video + music now
-        playVideoSafe();
+        // Start Miami music + YT background now
         playMoodMusic('miami');
         loadMoodYtBg('miami');
         updateMusicCard('miami', true);
