@@ -580,8 +580,8 @@
             pointer-events: none;
         }
         .f1-page { position:relative; z-index:10; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px }
-        .f1-journal-btn { position:absolute; bottom:24px; right:24px; width:38px; height:38px; border-radius:50%; background:rgba(0,0,0,0.5); border:1px solid var(--color-subtle-border); color:var(--color-text-primary); font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0.6; transition:opacity 0.3s, border-color 0.3s; }
-        .f1-journal-btn:hover { opacity:1; border-color:var(--color-accent-blue); }
+        .f1-journal-btn { position:absolute; bottom:24px; right:24px; opacity:0.65; }
+        .f1-journal-btn:hover { opacity:1; border-color:var(--color-accent-blue); color:var(--color-accent-blue); }
         .f1-apology { font-size:0.38rem; color:rgba(255,255,255,0.22); text-align:center; letter-spacing:0.3px; font-style:italic; user-select:none }
         .page-header { position:absolute; top:90px; left:30px; font-size:0.8rem; z-index:10000 }
 
@@ -940,6 +940,26 @@
         }
         .sys-lock-dismiss:hover { border-color: #555; color: #666; }
 
+        /* ===================== BACKGROUND MEDIA PROMPT ===================== */
+        #bg-media-prompt {
+            display: none;
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.92);
+            z-index: 9100;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        #bg-media-prompt.active { display: flex; animation: flicker 0.3s; }
+        .bmp-actions { display:flex; gap:14px; justify-content:center; margin-top:8px; }
+        .bmp-btn {
+            background: none; border: 1px solid #222; color: #555;
+            font-family: var(--font-stack); font-size: 0.6rem;
+            letter-spacing: 3px; padding: 8px 22px; cursor: pointer;
+            text-transform: uppercase; transition: all 0.3s;
+        }
+        .bmp-btn:hover { border-color: var(--color-accent-blue); color: var(--color-accent-blue); }
+        .bmp-btn.bmp-yes { border-color: var(--color-accent-blue); color: var(--color-accent-blue); }
+
         /* ===================== SYSTEM PANEL (navbar dropdown) ===================== */
         .nav-system-wrap {
             position: relative;
@@ -1076,21 +1096,6 @@
             display: flex; flex-direction: column; gap: 3px;
             margin-bottom: 50px;
         }
-        .music-tracks-view { display: none; }
-        .music-tracks-view.active { display: block; }
-        .genre-grid {
-            display: flex; flex-wrap: wrap; gap: 14px;
-            margin-bottom: 30px;
-        }
-        .genre-card {
-            background: transparent; border: 1px solid var(--color-subtle-border);
-            color: var(--color-text-primary); padding: 18px 24px;
-            font-family: var(--font-mono); text-align: left; cursor: pointer;
-            min-width: 220px; transition: border-color 0.3s, background 0.3s;
-        }
-        .genre-card:hover { border-color: var(--color-accent-blue); background: rgba(255,255,255,0.03); }
-        .genre-name { font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 6px; }
-        .genre-count { font-size: 0.5rem; color: #555; letter-spacing: 2px; text-transform: uppercase; }
         .song-row {
             display: flex; align-items: center; gap: 20px;
             padding: 16px 20px;
@@ -2119,6 +2124,23 @@
         </div>
     </div>
 
+    <!-- background media (gif/video) keep/remove prompt -->
+    <div id="bg-media-prompt">
+        <div class="sys-lock-box">
+            <span class="sys-lock-icon">⬡</span>
+            <div class="sys-lock-title">Background Media</div>
+            <div class="sys-lock-sub">// Animated gif / video</div>
+            <div class="sys-lock-hint">
+                Keep the animated gif/video background<br>
+                for this mode, or use a plain colour tint instead?
+            </div>
+            <div class="bmp-actions">
+                <button class="bmp-btn bmp-yes" onclick="setBgMediaEnabled(true)">Keep it</button>
+                <button class="bmp-btn" onclick="setBgMediaEnabled(false)">No, tint only</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ===================== LANDING UI ===================== -->
     <div id="landing-ui">
         <div class="landing-logo" onclick="enterDriveMode()"><img src="wabilogo.png" alt="Enter Drive"></div>
@@ -2189,59 +2211,34 @@
                     <div class="back-btn" onclick="showSection('skills')">&#8592; Back</div>
                 </div>
                 <h2 class="sub-heading music-heading">Transmissions</h2>
-
-                <!-- GENRE SELECT -->
-                <div class="music-genre-view" id="music-genre-view">
-                    <div class="music-sub">// Pick a genre to open its tracks</div>
-                    <div class="genre-grid">
-                        <button class="genre-card" onclick="selectGenre('jpop')">
-                            <div class="genre-name">J-Pop / City Pop</div>
-                            <div class="genre-count">1 track</div>
-                        </button>
-                        <button class="genre-card" onclick="selectGenre('indie')">
-                            <div class="genre-name">Indie Folk</div>
-                            <div class="genre-count">1 track</div>
-                        </button>
-                        <button class="genre-card" onclick="selectGenre('pop')">
-                            <div class="genre-name">Pop / R&amp;B</div>
-                            <div class="genre-count">1 track</div>
-                        </button>
+                <div class="music-sub">// Select a track — music video plays, lofi pauses</div>
+                <div class="song-list">
+                    <div class="song-row" onclick="playSong(0)">
+                        <div class="song-num">01</div>
+                        <div class="song-pip"></div>
+                        <div class="song-info">
+                            <div class="song-title">Odoriko</div>
+                            <div class="song-artist">Vaundy</div>
+                        </div>
+                        <div class="song-duration">4:53</div>
                     </div>
-                    <div class="jp-placeholder">// More genres and tracks coming soon</div>
-                </div>
-
-                <!-- TRACK LIST (shown after a genre is picked) -->
-                <div class="music-tracks-view" id="music-tracks-view">
-                    <div class="back-btn" onclick="backToGenres()" style="margin-bottom:16px;">&#8592; Genres</div>
-                    <div class="music-sub" id="music-tracks-label">// Select a track — music video plays, lofi pauses</div>
-                    <div class="song-list">
-                        <div class="song-row" data-genre="jpop" onclick="playSong(0)">
-                            <div class="song-num">01</div>
-                            <div class="song-pip"></div>
-                            <div class="song-info">
-                                <div class="song-title">Odoriko</div>
-                                <div class="song-artist">Vaundy</div>
-                            </div>
-                            <div class="song-duration">4:53</div>
+                    <div class="song-row" onclick="playSong(1)">
+                        <div class="song-num">02</div>
+                        <div class="song-pip"></div>
+                        <div class="song-info">
+                            <div class="song-title">Riptide</div>
+                            <div class="song-artist">Vance Joy</div>
                         </div>
-                        <div class="song-row" data-genre="indie" onclick="playSong(1)">
-                            <div class="song-num">02</div>
-                            <div class="song-pip"></div>
-                            <div class="song-info">
-                                <div class="song-title">Riptide</div>
-                                <div class="song-artist">Vance Joy</div>
-                            </div>
-                            <div class="song-duration">3:24</div>
+                        <div class="song-duration">3:24</div>
+                    </div>
+                    <div class="song-row" onclick="playSong(2)">
+                        <div class="song-num">03</div>
+                        <div class="song-pip"></div>
+                        <div class="song-info">
+                            <div class="song-title">Confirmations</div>
+                            <div class="song-artist">Justin Bieber</div>
                         </div>
-                        <div class="song-row" data-genre="pop" onclick="playSong(2)">
-                            <div class="song-num">03</div>
-                            <div class="song-pip"></div>
-                            <div class="song-info">
-                                <div class="song-title">Confirmations</div>
-                                <div class="song-artist">Justin Bieber</div>
-                            </div>
-                            <div class="song-duration">3:50</div>
-                        </div>
+                        <div class="song-duration">3:50</div>
                     </div>
                 </div>
             </section>
@@ -2331,7 +2328,7 @@
                     <div class="page-header">
                         <div class="back-btn" onclick="showSection('skills')">&#8592; Back</div>
                     </div>
-                    <button class="f1-journal-btn" title="Journal — coming soon">&#128214;</button>
+                    <div class="back-btn f1-journal-btn" title="Journal — coming soon">Journal</div>
                 </div>
             </section>
 
@@ -2692,6 +2689,18 @@
                     <input type="range" id="color-hue-slider" min="0" max="360" value="180">
                     <div class="color-slide-note">// drag to tint the accent colour within the current mood &nbsp;·&nbsp; switching mood resets this</div>
                 </div>
+
+                <!-- BACKGROUND MEDIA TOGGLE -->
+                <div class="color-slide-wrap">
+                    <div class="color-slide-label">
+                        Animated Background &nbsp;·&nbsp; <span id="bg-media-status">On</span>
+                    </div>
+                    <div style="display:flex; gap:14px; margin-top:6px;">
+                        <button class="bmp-btn bmp-yes" id="bg-media-toggle-yes" onclick="setBgMediaEnabled(true)">Yes, keep gif/video</button>
+                        <button class="bmp-btn" id="bg-media-toggle-no" onclick="setBgMediaEnabled(false)">No, tint only</button>
+                    </div>
+                    <div class="color-slide-note">// applies to gif/video backgrounds across all modes</div>
+                </div>
             </section>
 
             <!-- ===================== CONTACT ===================== -->
@@ -2768,6 +2777,8 @@
         correctCode='1439',attempts=0,maxAttempts=5,
         curVideo='background.mp4',
         konamiCode=[],konamiSeq=['o','m','o','t','e','n','a','s','h','i'];
+    let bgMediaEnabled=sessionStorage.getItem('bgMediaEnabled')!=='false',
+        bgMediaPromptShown=false;
     let curCarousel='tv',curSlide=0;
     const codeDigits=document.querySelectorAll('.code-input-digit'),
           codeDisplay=document.getElementById('code-display'),
@@ -2999,6 +3010,8 @@
         videoBg.pause();
         videoBg.style.opacity = 0;
 
+        if (!bgMediaEnabled) return; // tint-only: body colour + mood-overlay stand in for gif/video
+
         if (mood === 'highspec') {
             videoBg.src = 'Drive.mp4';
             videoBg.loop = true;
@@ -3016,6 +3029,29 @@
     }
     // kept as an alias — older code below still calls loadMoodYtBg(mood)
     function loadMoodYtBg(mood) { updateMoodBackground(mood); }
+
+    function maybeShowBgMediaPrompt() {
+        if (bgMediaPromptShown) return;
+        bgMediaPromptShown = true;
+        if (sessionStorage.getItem('bgMediaEnabled') !== null) return; // already chosen this session
+        document.getElementById('bg-media-prompt').classList.add('active');
+    }
+
+    window.setBgMediaEnabled = function(enabled) {
+        bgMediaEnabled = enabled;
+        bgMediaPromptShown = true;
+        sessionStorage.setItem('bgMediaEnabled', enabled ? 'true' : 'false');
+        document.getElementById('bg-media-prompt').classList.remove('active');
+        const statusEl = document.getElementById('bg-media-status');
+        if (statusEl) statusEl.textContent = enabled ? 'On' : 'Off';
+        const yesBtn = document.getElementById('bg-media-toggle-yes'),
+              noBtn = document.getElementById('bg-media-toggle-no');
+        if (yesBtn && noBtn) {
+            yesBtn.classList.toggle('bmp-yes', enabled);
+            noBtn.classList.toggle('bmp-yes', !enabled);
+        }
+        if (hasStarted) updateMoodBackground(currentMood);
+    };
 
     function getAccentForMood(mood) {
         const map = { highspec:'#00FFFF', miami:'#FF2D78', renewal:'#4DFFB4', wistful:'#8BA7C7' };
@@ -3304,7 +3340,6 @@
                 iframe.src='https://www.youtube.com/embed/RkpQvhg-IWw?autoplay=1&mute=1&loop=1&playlist=RkpQvhg-IWw&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3';
             }
         }
-        if(id==='music-section'&&typeof backToGenres==='function'){backToGenres();}
         if(id==='minesweeper-hormuz'){initSweep();}
         if(id==='star-map'){setTimeout(initStarMap,60);}
         if(id==='freq-dial'){setTimeout(initFreqDial,60);}
@@ -3843,20 +3878,6 @@
     ];
     let currentSong = null;
     let preMusicVolume = 0.5;
-
-    window.selectGenre = function(genre) {
-        document.getElementById('music-genre-view').style.display = 'none';
-        document.getElementById('music-tracks-view').classList.add('active');
-        document.querySelectorAll('#music-tracks-view .song-row').forEach(row => {
-            row.style.display = (row.dataset.genre === genre) ? 'flex' : 'none';
-        });
-        const labels = { jpop: 'J-Pop / City Pop', indie: 'Indie Folk', pop: 'Pop / R&B' };
-        document.getElementById('music-tracks-label').textContent = `// ${labels[genre] || ''} — select a track`;
-    };
-    window.backToGenres = function() {
-        document.getElementById('music-tracks-view').classList.remove('active');
-        document.getElementById('music-genre-view').style.display = '';
-    };
 
     window.playSong = function(idx) {
         const song = SONGS[idx];
@@ -4495,6 +4516,8 @@
                 // If Miami was chosen, show the portrait welcome card
                 if (currentMood === 'miami') {
                     document.getElementById('miami-welcome').classList.add('active');
+                } else {
+                    setTimeout(maybeShowBgMediaPrompt, 1400);
                 }
             });
         }, 700);
@@ -4514,6 +4537,7 @@
         updateMoodBackground('miami');
         playMoodMusic('miami');
         updateMusicCard('miami', true);
+        setTimeout(maybeShowBgMediaPrompt, 900);
     };
 
     // Also show Miami welcome after affirming Miami via mood prompt
@@ -4538,6 +4562,15 @@
         // Pre-select Miami visually
         const miamiBtn = document.querySelector('.ms-btn-miami');
         if (miamiBtn) { msChosenMode = 'miami'; }
+        // Sync background-media toggle UI with stored preference
+        const statusEl = document.getElementById('bg-media-status'),
+              yesBtn = document.getElementById('bg-media-toggle-yes'),
+              noBtn = document.getElementById('bg-media-toggle-no');
+        if (statusEl) statusEl.textContent = bgMediaEnabled ? 'On' : 'Off';
+        if (yesBtn && noBtn) {
+            yesBtn.classList.toggle('bmp-yes', bgMediaEnabled);
+            noBtn.classList.toggle('bmp-yes', !bgMediaEnabled);
+        }
     });
     </script>
 </body>
