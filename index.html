@@ -92,13 +92,6 @@
         .landing-link { text-decoration:none; color:var(--color-text-primary); font-size:1.6rem; font-weight:700; text-transform:uppercase; letter-spacing:4px; transition:all 0.3s ease; text-shadow:0 0 5px rgba(255,255,255,0.3); cursor:pointer; font-family:var(--font-heading); }
         .landing-link:hover { transform:scale(1.1) translateX(-8px); color:var(--color-accent-white); text-shadow:0 0 14px var(--color-accent-white) }
 
-        #initial-play { display: none !important; }
-        #volume-controls { display: none !important; }
-        #volume-slider { -webkit-appearance:none; appearance:none; width:100px; height:5px; background:var(--color-text-primary); cursor:pointer; box-shadow:0 0 5px rgba(255,255,255,0.5); opacity:0.8; border-radius:2px }
-        #volume-slider::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:var(--color-text-primary); box-shadow:0 0 8px rgba(255,255,255,0.8); transition:background 0.2s }
-        #volume-slider::-moz-range-thumb { width:12px; height:12px; border-radius:50%; background:var(--color-text-primary); border:none; box-shadow:0 0 8px rgba(255,255,255,0.8) }
-        #play-pause-icon { color:var(--color-text-primary); cursor:pointer; font-size:1.1rem; text-shadow:0 0 5px rgba(255,255,255,0.5); transition:transform 0.3s }
-
         #drive-content-ui { position:absolute; top:0; left:0; width:100%; height:100%; z-index:20; overflow-y:auto; background:rgba(0,0,0,0.85); opacity:0; visibility:hidden; pointer-events:none; transition:opacity 0.8s ease-in-out, visibility 0.8s; scroll-behavior:smooth }
         #drive-content-ui.active { opacity:1; visibility:visible; pointer-events:auto }
 
@@ -587,7 +580,8 @@
             pointer-events: none;
         }
         .f1-page { position:relative; z-index:10; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px }
-        .f1-message { font-size:3.5rem; font-weight:700; text-align:center; text-shadow:0 0 20px var(--color-error); color:var(--color-error); font-family:var(--font-heading); letter-spacing:4px; }
+        .f1-journal-btn { position:absolute; bottom:24px; right:24px; width:38px; height:38px; border-radius:50%; background:rgba(0,0,0,0.5); border:1px solid var(--color-subtle-border); color:var(--color-text-primary); font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0.6; transition:opacity 0.3s, border-color 0.3s; }
+        .f1-journal-btn:hover { opacity:1; border-color:var(--color-accent-blue); }
         .f1-apology { font-size:0.38rem; color:rgba(255,255,255,0.22); text-align:center; letter-spacing:0.3px; font-style:italic; user-select:none }
         .page-header { position:absolute; top:90px; left:30px; font-size:0.8rem; z-index:10000 }
 
@@ -781,7 +775,8 @@
             background-size: cover; background-position: center;
             opacity: 0.35; pointer-events: none;
         }
-        .sw-waves { position:fixed; top:0; left:0; width:100%; height:100%; opacity:0.04; z-index:1; background-image:repeating-linear-gradient(0deg,transparent,transparent 20px,rgba(0,255,255,0.2) 20px,rgba(0,255,255,0.2) 21px), repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(0,200,200,0.1) 40px,rgba(0,200,200,0.1) 41px); animation:sw-wave 24s linear infinite; }
+        .sw-waves { position:fixed; top:0; left:0; width:100%; height:100%; opacity:0.04; z-index:1; pointer-events:none; background-image:repeating-linear-gradient(0deg,transparent,transparent 20px,rgba(0,255,255,0.2) 20px,rgba(0,255,255,0.2) 21px), repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(0,200,200,0.1) 40px,rgba(0,200,200,0.1) 41px); animation:sw-wave 24s linear infinite; }
+        .sw-back { position:relative; z-index:20; }
         @keyframes sw-wave { 0%{background-position:0 0} 100%{background-position:0 80px} }
         .sw-container { position:relative; z-index:10; display:flex; flex-direction:column; align-items:center; padding:55px 20px 40px; min-height:100vh }
         .sw-header { text-align:center; margin-bottom:14px }
@@ -1068,87 +1063,6 @@
         #reboot-overlay.fade-out { opacity: 0; }
         #reboot-lines { }
 
-        /* ===================== MOOD CONFIRM DIALOG ===================== */
-        #mood-confirm-overlay {
-            display: none;
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.88);
-            z-index: 9500;
-            align-items: center; justify-content: center;
-            backdrop-filter: blur(3px);
-        }
-        #mood-confirm-overlay.active { display: flex; animation: flicker 0.2s; }
-        .mood-confirm-box {
-            border: 1px solid var(--color-accent-blue);
-            background: #030308;
-            padding: 36px 44px;
-            max-width: 400px;
-            width: 90%;
-            position: relative;
-            box-shadow: 0 0 40px rgba(0,0,0,0.9), 0 0 20px rgba(0,255,255,0.06);
-            transition: border-color 0.5s;
-        }
-        .mood-confirm-box::before {
-            content: '';
-            position: absolute; top:0; left:0; right:0; height:1px;
-            background: linear-gradient(90deg, transparent, var(--color-accent-blue), transparent);
-        }
-        .mood-confirm-eyebrow {
-            font-size: 0.48rem; letter-spacing: 4px;
-            color: #333; text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-        .mood-confirm-title {
-            font-size: 1.1rem; font-weight: 700;
-            color: var(--color-accent-blue);
-            text-shadow: 0 0 10px var(--color-accent-blue);
-            letter-spacing: 3px; text-transform: uppercase;
-            margin-bottom: 6px;
-            transition: color 0.5s, text-shadow 0.5s;
-        }
-        .mood-confirm-sub {
-            font-size: 0.58rem; color: #333;
-            letter-spacing: 2px; margin-bottom: 26px;
-            line-height: 1.8;
-        }
-        .mood-confirm-sub strong { color: #555; }
-        .mood-confirm-warn {
-            font-size: 0.52rem; color: #ffcc0088;
-            letter-spacing: 2px; margin-bottom: 22px;
-        }
-        .mood-confirm-btns {
-            display: flex; gap: 10px;
-        }
-        .mood-confirm-yes {
-            flex: 1;
-            background: transparent;
-            border: 1px solid var(--color-accent-blue);
-            color: var(--color-accent-blue);
-            font-family: var(--font-stack);
-            font-size: 0.65rem; letter-spacing: 3px;
-            text-transform: uppercase;
-            padding: 10px;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-        .mood-confirm-yes:hover {
-            background: rgba(0,255,255,0.07);
-            box-shadow: 0 0 12px rgba(0,255,255,0.2);
-        }
-        .mood-confirm-no {
-            flex: 1;
-            background: transparent;
-            border: 1px solid #222;
-            color: #444;
-            font-family: var(--font-stack);
-            font-size: 0.65rem; letter-spacing: 3px;
-            text-transform: uppercase;
-            padding: 10px;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-        .mood-confirm-no:hover { border-color: #555; color: #666; }
-
         /* ===================== MUSIC PLAYER SECTION ===================== */
         #music-section { }
         .music-back { padding: 30px 0 10px; }
@@ -1162,6 +1076,21 @@
             display: flex; flex-direction: column; gap: 3px;
             margin-bottom: 50px;
         }
+        .music-tracks-view { display: none; }
+        .music-tracks-view.active { display: block; }
+        .genre-grid {
+            display: flex; flex-wrap: wrap; gap: 14px;
+            margin-bottom: 30px;
+        }
+        .genre-card {
+            background: transparent; border: 1px solid var(--color-subtle-border);
+            color: var(--color-text-primary); padding: 18px 24px;
+            font-family: var(--font-mono); text-align: left; cursor: pointer;
+            min-width: 220px; transition: border-color 0.3s, background 0.3s;
+        }
+        .genre-card:hover { border-color: var(--color-accent-blue); background: rgba(255,255,255,0.03); }
+        .genre-name { font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 6px; }
+        .genre-count { font-size: 0.5rem; color: #555; letter-spacing: 2px; text-transform: uppercase; }
         .song-row {
             display: flex; align-items: center; gap: 20px;
             padding: 16px 20px;
@@ -1650,6 +1579,16 @@
             border: none; pointer-events: none;
             /* individual filter set per mood via JS */
         }
+        /* Miami Arcade — gif background */
+        #miami-bg-gif {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            z-index: 0; pointer-events: none;
+            background-image: url('_(5).gif');
+            background-size: cover; background-position: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        #miami-bg-gif.visible { opacity: 1; }
         /* Miami overlay — solid pink tint since no bg video */
         #miami-overlay {
             position: fixed; top:0; left:0; width:100%; height:100%;
@@ -1658,161 +1597,6 @@
             background: radial-gradient(ellipse at 30% 50%, rgba(255,45,120,0.18) 0%, rgba(180,0,80,0.12) 40%, rgba(0,0,0,0) 80%),
                         radial-gradient(ellipse at 70% 20%, rgba(255,120,200,0.12) 0%, rgba(0,0,0,0) 60%);
         }
-
-        /* ===================== MOOD CONFIRM + MINI REBOOT ===================== */
-        #mood-confirm-overlay {
-            display: none;
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.88);
-            z-index: 9200;
-            align-items: center; justify-content: center;
-            backdrop-filter: blur(6px);
-        }
-        #mood-confirm-overlay.active { display: flex; animation: flicker 0.2s; }
-        .mood-confirm-box {
-            border: 1px solid var(--color-accent-blue);
-            background: #030308;
-            padding: 36px 44px;
-            max-width: 400px; width: 90%;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,0.9), 0 0 20px rgba(0,255,255,0.06);
-        }
-        .mood-confirm-box::before {
-            content: '';
-            position: absolute; top:0; left:0; right:0; height:2px;
-            background: linear-gradient(90deg, transparent, var(--color-accent-blue), transparent);
-        }
-        .mood-confirm-label {
-            font-size: 0.5rem; letter-spacing: 4px; color: #333;
-            text-transform: uppercase; margin-bottom: 10px;
-        }
-        .mood-confirm-name {
-            font-size: 1.4rem; font-weight: 700;
-            color: var(--color-accent-blue);
-            text-shadow: 0 0 12px var(--color-accent-blue);
-            letter-spacing: 3px; text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-        .mood-confirm-sub {
-            font-size: 0.55rem; color: #333;
-            letter-spacing: 2px; margin-bottom: 28px;
-        }
-        .mood-confirm-btns {
-            display: flex; gap: 10px; justify-content: center;
-        }
-        .mood-confirm-yes {
-            background: var(--color-accent-blue);
-            color: #000; border: none;
-            font-family: var(--font-stack);
-            font-size: 0.65rem; font-weight: 700;
-            letter-spacing: 3px; text-transform: uppercase;
-            padding: 10px 28px; cursor: pointer;
-            transition: all 0.25s;
-        }
-        .mood-confirm-yes:hover { filter: brightness(1.2); transform: translateY(-1px); }
-        .mood-confirm-no {
-            background: transparent;
-            color: #444; border: 1px solid #222;
-            font-family: var(--font-stack);
-            font-size: 0.65rem; letter-spacing: 3px;
-            text-transform: uppercase; padding: 10px 20px;
-            cursor: pointer; transition: all 0.25s;
-        }
-        .mood-confirm-no:hover { border-color: #555; color: #666; }
-
-        /* ===================== MINI REBOOT ===================== */
-        #mini-reboot {
-            display: none;
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: #000;
-            z-index: 9300;
-            padding: 60px 80px;
-            font-family: 'Inconsolata', monospace;
-        }
-        #mini-reboot.active { display: block; }
-        #mini-reboot-lines { }
-        .mr-line {
-            font-size: 0.72rem; letter-spacing: 2px;
-            text-transform: uppercase; line-height: 2.1;
-            opacity: 0; transition: opacity 0.12s ease;
-        }
-        .mr-line.visible { opacity: 1; }
-        .mr-prefix { color: #222; }
-        .mr-ok { color: #00ff88; margin-left: 10px; }
-        .mr-accent { color: var(--color-accent-blue); text-shadow: 0 0 8px var(--color-accent-blue); margin-left: 10px; }
-
-        /* ===================== MUSIC PLAYER OVERLAY ===================== */
-        #music-player-overlay {
-            display: none;
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.96);
-            z-index: 9500;
-            flex-direction: column;
-            align-items: center; justify-content: center;
-            gap: 20px;
-        }
-        #music-player-overlay.active { display: flex; animation: flicker 0.3s; }
-        .mp-close {
-            position: absolute; top: 22px; right: 30px;
-            font-size: 1.6rem; color: #333; cursor: pointer;
-            transition: color 0.2s; font-family: var(--font-stack);
-        }
-        .mp-close:hover { color: var(--color-accent-white); }
-        .mp-label {
-            font-size: 0.52rem; letter-spacing: 4px;
-            color: #333; text-transform: uppercase;
-        }
-        .mp-title {
-            font-size: 1.6rem; font-weight: 700;
-            color: var(--color-accent-white);
-            letter-spacing: 2px;
-        }
-        .mp-artist {
-            font-size: 0.7rem; color: #444;
-            letter-spacing: 3px; text-transform: uppercase;
-        }
-        .mp-frame-wrap {
-            width: min(640px, 90vw);
-            aspect-ratio: 16/9;
-            border: 1px solid #1a1a1a;
-            overflow: hidden;
-            position: relative;
-        }
-        .mp-frame-wrap iframe {
-            width: 100%; height: 100%;
-            border: none;
-        }
-        .mp-pip {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: var(--color-accent-blue);
-            box-shadow: 0 0 8px var(--color-accent-blue);
-            animation: pulse-dot 1.4s infinite;
-        }
-        /* end-of-video prompt */
-        #mp-end-prompt {
-            display: none;
-            flex-direction: column; align-items: center; gap: 14px;
-        }
-        #mp-end-prompt.active { display: flex; }
-        .mp-end-label {
-            font-size: 0.6rem; color: #444; letter-spacing: 3px; text-transform: uppercase;
-        }
-        .mp-end-btns { display: flex; gap: 10px; }
-        .mp-end-yes {
-            background: var(--color-accent-blue); color: #000;
-            border: none; font-family: var(--font-stack); font-size: 0.62rem;
-            font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-            padding: 9px 22px; cursor: pointer; transition: filter 0.2s;
-        }
-        .mp-end-yes:hover { filter: brightness(1.2); }
-        .mp-end-no {
-            background: transparent; color: #444; border: 1px solid #222;
-            font-family: var(--font-stack); font-size: 0.62rem;
-            letter-spacing: 2px; text-transform: uppercase;
-            padding: 9px 16px; cursor: pointer; transition: all 0.2s;
-        }
-        .mp-end-no:hover { border-color: #555; color: #666; }
 
         @keyframes fadeIn { to{opacity:1} }
 
@@ -2233,46 +2017,11 @@
         </div>
     </div>
 
-    <!-- mood switch confirm dialog -->
-    <!-- music player overlay -->
-    <div id="music-player-overlay">
-        <span class="mp-close" onclick="closeMusicPlayer()">&#215;</span>
-        <div class="mp-label">// Now Transmitting</div>
-        <div class="mp-pip"></div>
-        <div class="mp-title" id="mp-song-title">Odoriko</div>
-        <div class="mp-artist" id="mp-song-artist">Vaundy</div>
-        <div class="mp-frame-wrap">
-            <iframe id="mp-yt-frame" src="about:blank" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        </div>
-        <div id="mp-end-prompt">
-            <div class="mp-end-label">// Track ended — resume lofi?</div>
-            <div class="mp-end-btns">
-                <button class="mp-end-yes" onclick="resumeLofi()">Resume Lofi</button>
-                <button class="mp-end-no" onclick="closeMusicPlayer()">Close</button>
-            </div>
-        </div>
-    </div>
-
     <!-- mood reboot overlay (shorter version of boot, triggered on mood change) -->
     <div id="reboot-overlay">
         <div id="reboot-lines"></div>
     </div>
 
-    <!-- mood change confirm dialog -->
-    <div id="mood-confirm-overlay">
-        <div class="mood-confirm-box">
-            <div class="mood-confirm-eyebrow">// System — Aesthetic Override</div>
-            <div class="mood-confirm-title" id="mood-confirm-title">Switching Mode</div>
-            <div class="mood-confirm-sub" id="mood-confirm-sub">Switching to <strong id="mood-confirm-name"></strong> will reboot the aesthetic system and reload all visual and audio streams.</div>
-            <div class="mood-confirm-warn">// A reboot sequence will play</div>
-            <div class="mood-confirm-btns">
-                <button class="mood-confirm-yes" id="mood-confirm-yes">Confirm Shift</button>
-                <button class="mood-confirm-no" id="mood-confirm-no">Abort</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- music video popup -->
     <!-- ===================== PIP MINIPLAYER ===================== -->
     <div id="pip-player">
         <div class="pip-chrome">
@@ -2344,6 +2093,8 @@
     <div id="mood-overlay"></div>
     <!-- mood youtube background (for modes that use it) -->
     <div id="mood-yt-bg"><iframe id="mood-yt-iframe" src="about:blank" allow="autoplay; encrypted-media" allowfullscreen title="Mood background"></iframe></div>
+    <!-- miami arcade gif background -->
+    <div id="miami-bg-gif"></div>
     <!-- miami neon overlay -->
     <div id="miami-overlay"></div>
     <div id="background-element"></div>
@@ -2375,12 +2126,6 @@
             <a class="landing-link" onclick="enterDriveMode('skills')">Mood</a>
             <a class="landing-link" onclick="enterDriveMode('experience')">Archives</a>
         </div>
-    </div>
-    <!-- hidden refs kept for JS compatibility -->
-    <button id="initial-play" style="display:none" aria-label="Start Music and Video"></button>
-    <div id="volume-controls" style="display:none">
-        <span id="play-pause-icon" class="material-icons">pause</span>
-        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5">
     </div>
 
     <!-- ===================== DRIVE CONTENT UI ===================== -->
@@ -2444,34 +2189,59 @@
                     <div class="back-btn" onclick="showSection('skills')">&#8592; Back</div>
                 </div>
                 <h2 class="sub-heading music-heading">Transmissions</h2>
-                <div class="music-sub">// Select a track — music video plays, lofi pauses</div>
-                <div class="song-list">
-                    <div class="song-row" onclick="playSong(0)">
-                        <div class="song-num">01</div>
-                        <div class="song-pip"></div>
-                        <div class="song-info">
-                            <div class="song-title">Odoriko</div>
-                            <div class="song-artist">Vaundy</div>
-                        </div>
-                        <div class="song-duration">4:53</div>
+
+                <!-- GENRE SELECT -->
+                <div class="music-genre-view" id="music-genre-view">
+                    <div class="music-sub">// Pick a genre to open its tracks</div>
+                    <div class="genre-grid">
+                        <button class="genre-card" onclick="selectGenre('jpop')">
+                            <div class="genre-name">J-Pop / City Pop</div>
+                            <div class="genre-count">1 track</div>
+                        </button>
+                        <button class="genre-card" onclick="selectGenre('indie')">
+                            <div class="genre-name">Indie Folk</div>
+                            <div class="genre-count">1 track</div>
+                        </button>
+                        <button class="genre-card" onclick="selectGenre('pop')">
+                            <div class="genre-name">Pop / R&amp;B</div>
+                            <div class="genre-count">1 track</div>
+                        </button>
                     </div>
-                    <div class="song-row" onclick="playSong(1)">
-                        <div class="song-num">02</div>
-                        <div class="song-pip"></div>
-                        <div class="song-info">
-                            <div class="song-title">Riptide</div>
-                            <div class="song-artist">Vance Joy</div>
+                    <div class="jp-placeholder">// More genres and tracks coming soon</div>
+                </div>
+
+                <!-- TRACK LIST (shown after a genre is picked) -->
+                <div class="music-tracks-view" id="music-tracks-view">
+                    <div class="back-btn" onclick="backToGenres()" style="margin-bottom:16px;">&#8592; Genres</div>
+                    <div class="music-sub" id="music-tracks-label">// Select a track — music video plays, lofi pauses</div>
+                    <div class="song-list">
+                        <div class="song-row" data-genre="jpop" onclick="playSong(0)">
+                            <div class="song-num">01</div>
+                            <div class="song-pip"></div>
+                            <div class="song-info">
+                                <div class="song-title">Odoriko</div>
+                                <div class="song-artist">Vaundy</div>
+                            </div>
+                            <div class="song-duration">4:53</div>
                         </div>
-                        <div class="song-duration">3:24</div>
-                    </div>
-                    <div class="song-row" onclick="playSong(2)">
-                        <div class="song-num">03</div>
-                        <div class="song-pip"></div>
-                        <div class="song-info">
-                            <div class="song-title">Confirmations</div>
-                            <div class="song-artist">Justin Bieber</div>
+                        <div class="song-row" data-genre="indie" onclick="playSong(1)">
+                            <div class="song-num">02</div>
+                            <div class="song-pip"></div>
+                            <div class="song-info">
+                                <div class="song-title">Riptide</div>
+                                <div class="song-artist">Vance Joy</div>
+                            </div>
+                            <div class="song-duration">3:24</div>
                         </div>
-                        <div class="song-duration">3:50</div>
+                        <div class="song-row" data-genre="pop" onclick="playSong(2)">
+                            <div class="song-num">03</div>
+                            <div class="song-pip"></div>
+                            <div class="song-info">
+                                <div class="song-title">Confirmations</div>
+                                <div class="song-artist">Justin Bieber</div>
+                            </div>
+                            <div class="song-duration">3:50</div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -2500,12 +2270,8 @@
                             <div class="jp-culture-desc">// Your thoughts — already on the site as a review</div>
                             <div class="jp-culture-tag">// linked</div>
                         </div>
-                        <div class="jp-culture-card jp-add-card">
-                            <div class="jp-culture-name" style="color:#333;">+ Add Title</div>
-                            <div class="jp-culture-desc" style="color:#222;">// fill in your anime list here</div>
-                        </div>
                     </div>
-                    <div class="jp-placeholder">// Anime log — add series, films, and ongoing watches here later</div>
+                    <div class="jp-placeholder">// Anime log — more entries coming soon</div>
                 </div>
 
                 <!-- FOOD PANE -->
@@ -2526,12 +2292,8 @@
                             <div class="jp-culture-desc">// Your notes</div>
                             <div class="jp-culture-tag">// to fill</div>
                         </div>
-                        <div class="jp-culture-card jp-add-card">
-                            <div class="jp-culture-name" style="color:#333;">+ Add Item</div>
-                            <div class="jp-culture-desc" style="color:#222;">// fill in your food log here</div>
-                        </div>
                     </div>
-                    <div class="jp-placeholder">// Food archive — document dishes, meals, and culinary discoveries</div>
+                    <div class="jp-placeholder">// Food archive — more entries coming soon</div>
                 </div>
 
                 <!-- PLACES PANE -->
@@ -2552,12 +2314,8 @@
                             <div class="jp-culture-desc">// Dotonbori, street food — your notes here</div>
                             <div class="jp-culture-tag">// to fill</div>
                         </div>
-                        <div class="jp-culture-card jp-add-card">
-                            <div class="jp-culture-name" style="color:#333;">+ Add Place</div>
-                            <div class="jp-culture-desc" style="color:#222;">// fill in your places list here</div>
-                        </div>
                     </div>
-                    <div class="jp-placeholder">// Places archive — cities, neighbourhoods, and landscapes to document</div>
+                    <div class="jp-placeholder">// Places archive — more entries coming soon</div>
                 </div>
             </section>
 
@@ -2573,8 +2331,7 @@
                     <div class="page-header">
                         <div class="back-btn" onclick="showSection('skills')">&#8592; Back</div>
                     </div>
-                    <h1 class="f1-message">FUCK 63</h1>
-                    <p class="f1-apology">(sorry i was maybe too harsh on you lando)</p>
+                    <button class="f1-journal-btn" title="Journal — coming soon">&#128214;</button>
                 </div>
             </section>
 
@@ -3000,14 +2757,10 @@
     <script>
     // ===================== CORE SITE LOGIC =====================
     const siteBody=document.getElementById('site-body'),
-          playBtn=document.getElementById('initial-play'),
           videoBg=document.getElementById('video-bg'),
           audioBg=document.getElementById('background-audio'),
           landingUI=document.getElementById('landing-ui'),
           driveUI=document.getElementById('drive-content-ui'),
-          volControls=document.getElementById('volume-controls'),
-          volSlider=document.getElementById('volume-slider'),
-          playIcon=document.getElementById('play-pause-icon'),
           dtDisplay=document.getElementById('datetime-display');
 
     let isPlaying=false,hasStarted=false,
@@ -3076,7 +2829,7 @@
             }, 350);
             return;
         }
-        document.getElementById('system-panel').classList.toggle('open');
+        showSection('hacked-files');
     };
     document.addEventListener('click', function(e) {
         const wrap = document.getElementById('nav-system-wrap');
@@ -3185,7 +2938,7 @@
             musicFrame.src = 'about:blank';
             audioBg.src = cfg.musicSrc;
             audioBg.load();
-            audioBg.volume = parseFloat(volSlider.value) || 0.5;
+            audioBg.volume = audioBg.volume || 0.5;
             audioBg.play().catch(() => {});
             updateMusicCard(mood, true);
         }
@@ -3221,47 +2974,48 @@
             siteBody.style.removeProperty('--color-accent-white');
             siteBody.style.removeProperty('--color-success');
 
-            // swap video
+            // swap background (video / gif / youtube) + music
             if (hasStarted) {
-                videoBg.style.opacity = 0;
-                setTimeout(() => {
-                    if (mood === 'highspec') {
-                        // On mood switch back to highspec, just loop Drive.mp4 directly
-                        videoBg.src = 'Drive.mp4';
-                        videoBg.loop = true;
-                        videoBg.load();
-                        videoBg.play().catch(() => {});
-                    } else if (cfg.videoSrc) {
-                        videoBg.src = cfg.videoSrc;
-                        videoBg.loop = true;
-                        videoBg.load();
-                        videoBg.play().catch(() => {});
-                    }
-                    videoBg.style.opacity = 1;
-                }, 600);
-
-                // swap music
+                setTimeout(() => updateMoodBackground(mood), 600);
                 playMoodMusic(mood);
+            } else {
+                updateMoodBackground(mood);
             }
-
-            loadMoodYtBg(mood);
         });
     }
 
-    function loadMoodYtBg(mood) {
+    // Single source of truth for the visual background per mood:
+    // High Spec -> Drive.mp4 (video-bg), Miami -> gif, Renewal/Wistful -> their YouTube link.
+    function updateMoodBackground(mood) {
         const cfg = MOODS[mood];
         const ytWrap = document.getElementById('mood-yt-bg');
         const ytIframe = document.getElementById('mood-yt-iframe');
-        if (cfg.ytId) {
+        const gifBg = document.getElementById('miami-bg-gif');
+
+        // reset all background layers first
+        gifBg.classList.remove('visible');
+        ytWrap.classList.remove('visible');
+        ytIframe.src = 'about:blank';
+        videoBg.pause();
+        videoBg.style.opacity = 0;
+
+        if (mood === 'highspec') {
+            videoBg.src = 'Drive.mp4';
+            videoBg.loop = true;
+            videoBg.load();
+            videoBg.style.opacity = 1;
+            playVideoSafe();
+        } else if (mood === 'miami') {
+            gifBg.classList.add('visible');
+        } else if (cfg.ytId) {
             const src = `https://www.youtube.com/embed/${cfg.ytId}?autoplay=1&mute=1&loop=1&playlist=${cfg.ytId}&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&start=${cfg.ytStart}`;
             ytIframe.src = src;
             ytIframe.style.filter = cfg.ytFilter;
             ytWrap.classList.add('visible');
-        } else {
-            ytIframe.src = 'about:blank';
-            ytWrap.classList.remove('visible');
         }
     }
+    // kept as an alias — older code below still calls loadMoodYtBg(mood)
+    function loadMoodYtBg(mood) { updateMoodBackground(mood); }
 
     function getAccentForMood(mood) {
         const map = { highspec:'#00FFFF', miami:'#FF2D78', renewal:'#4DFFB4', wistful:'#8BA7C7' };
@@ -3461,7 +3215,11 @@
 
     // ===================== VIDEO / AUDIO =====================
     async function playVideoSafe(){
-        try{await videoBg.play();isPlaying=true;playIcon.textContent='pause'}catch(e){}
+        try{
+            await videoBg.play();isPlaying=true;
+            const mccBtn=document.getElementById('mcc-playpause');
+            if(mccBtn)mccBtn.innerHTML='&#9646;&#9646;';
+        }catch(e){}
     }
 
     // High Spec: Drive.mp4 loops immediately
@@ -3477,30 +3235,21 @@
         // safety fallback — shouldn't fire since loop=true
         playVideoSafe();
     });
-    document.addEventListener('visibilitychange',()=>{if(!document.hidden&&hasStarted&&videoBg.paused)playVideoSafe()});
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden&&hasStarted&&currentMood==='highspec'&&videoBg.paused)playVideoSafe()});
 
-    // Auto-start video and music (no play button needed)
+    // Auto-start background + music (no play button needed)
     function autoStartMedia() {
         if (hasStarted) return;
         hasStarted = true; isPlaying = true;
+        videoBg.muted = false;
 
         if (currentMood === 'miami') {
-            // Miami: no Drive.mp4, no music yet — music starts on Continue
-            videoBg.src = '';
-            videoBg.pause();
-        } else {
-            // All other modes: play Drive.mp4 + music immediately
-            videoBg.muted = false;
-            videoBg.src = 'Drive.mp4';
-            videoBg.loop = true;
-            videoBg.load();
-            playVideoSafe();
-            playMoodMusic(currentMood);
+            // Miami: gif background + music are queued — they start on Continue
+            return;
         }
+        updateMoodBackground(currentMood);
+        playMoodMusic(currentMood);
     }
-
-    // keep playBtn handler as stub for compatibility
-    playBtn.addEventListener('click', autoStartMedia);
 
     // ===================== NAVIGATION =====================
     window.enterDriveMode=function(target=null){
@@ -3555,6 +3304,7 @@
                 iframe.src='https://www.youtube.com/embed/RkpQvhg-IWw?autoplay=1&mute=1&loop=1&playlist=RkpQvhg-IWw&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3';
             }
         }
+        if(id==='music-section'&&typeof backToGenres==='function'){backToGenres();}
         if(id==='minesweeper-hormuz'){initSweep();}
         if(id==='star-map'){setTimeout(initStarMap,60);}
         if(id==='freq-dial'){setTimeout(initFreqDial,60);}
@@ -3579,15 +3329,6 @@
         },100);
     };
 
-    volSlider.addEventListener('input', e => {
-        audioBg.volume = e.target.value;
-        const mccVol = document.getElementById('mcc-vol');
-        if (mccVol) { mccVol.value = e.target.value; mccSetVol(e.target.value); }
-    });
-    playIcon.addEventListener('click',()=>{
-        if(isPlaying){audioBg.pause();videoBg.pause();playIcon.textContent='play_arrow';isPlaying=false}
-        else{audioBg.play();playVideoSafe();playIcon.textContent='pause';isPlaying=true}
-    });
     document.addEventListener('keydown',e=>{
         konamiCode.push(e.key);
         if(konamiCode.length>konamiSeq.length)konamiCode.shift();
@@ -3663,7 +3404,7 @@
         clearInterval(swTimer);swSecs=0;swDead=false;swFirst=true;
         const timerEl=document.getElementById('sw-timer');if(timerEl)timerEl.textContent='000';
         const statusEl=document.getElementById('sw-status');if(statusEl){statusEl.textContent='STANDBY';statusEl.style.color='';}
-        const overlayEl=document.getElementById('sw-overlay');if(overlayEl)overlayEl.style.display='none';
+        const overlayEl=document.getElementById('sw-overlay');if(overlayEl){overlayEl.style.display='none';overlayEl.classList.remove('sw-overlay-anim');}
         if(swMode==='hormuz'){
             swRows=HORMUZ_ROWS;swCols=HORMUZ_COLS;swMines=HORMUZ_MINES;
             swVoid=Array.from({length:swRows},(_,r)=>Array.from({length:swCols},(_,c)=>HORMUZ_MAP[r][c]==='0'));
@@ -4103,10 +3844,24 @@
     let currentSong = null;
     let preMusicVolume = 0.5;
 
+    window.selectGenre = function(genre) {
+        document.getElementById('music-genre-view').style.display = 'none';
+        document.getElementById('music-tracks-view').classList.add('active');
+        document.querySelectorAll('#music-tracks-view .song-row').forEach(row => {
+            row.style.display = (row.dataset.genre === genre) ? 'flex' : 'none';
+        });
+        const labels = { jpop: 'J-Pop / City Pop', indie: 'Indie Folk', pop: 'Pop / R&B' };
+        document.getElementById('music-tracks-label').textContent = `// ${labels[genre] || ''} — select a track`;
+    };
+    window.backToGenres = function() {
+        document.getElementById('music-tracks-view').classList.remove('active');
+        document.getElementById('music-genre-view').style.display = '';
+    };
+
     window.playSong = function(idx) {
         const song = SONGS[idx];
         currentSong = idx;
-        preMusicVolume = audioBg.volume || parseFloat(volSlider.value);
+        preMusicVolume = audioBg.volume || 0.5;
 
         // silence background audio
         audioBg.pause();
@@ -4732,7 +4487,7 @@
                 initializeGame();
                 showSection(hackSuccess ? 'hacked-files' : 'intro-section');
                 syncMoodButtons(currentMood);
-                loadMoodYtBg(currentMood);
+                if (currentMood !== 'miami') updateMoodBackground(currentMood);
                 autoStartMedia();
                 // For Miami, music card shows as paused until Continue
                 updateMusicCard(currentMood, currentMood !== 'miami');
@@ -4755,9 +4510,9 @@
             mw.style.opacity = '';
             mw.style.transition = '';
         }, 500);
-        // Start Miami music + YT background now
+        // Start Miami background + music now
+        updateMoodBackground('miami');
         playMoodMusic('miami');
-        loadMoodYtBg('miami');
         updateMusicCard('miami', true);
     };
 
