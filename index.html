@@ -2198,7 +2198,6 @@
     <div id="landing-ui">
         <div class="landing-logo" onclick="enterDriveMode()"><img src="wabilogo.png" alt="Enter Drive"></div>
         <div class="landing-nav">
-            <a class="landing-link" onclick="enterDriveMode('watchlist')">Watchlist</a>
             <a class="landing-link" onclick="enterDriveMode('f1-journal')">F1 Journal</a>
         </div>
     </div>
@@ -2296,23 +2295,10 @@
                 </div>
             </section>
 
-            <!-- ===================== WATCHLIST (MyAnimeList) ===================== -->
-            <section id="watchlist" class="section">
-                <h2 class="sub-heading">Watchlist</h2>
-                <p class="typewriter">// Upload your MyAnimeList.xml to populate this section</p>
-                <div style="margin-top:30px;">
-                    <input type="file" id="mal-xml-upload" accept=".xml" onchange="uploadMALXML(event)" style="padding:10px; background:#000; border:1px solid #222; color:#555; font-family:var(--font-mono); cursor:pointer;">
-                    <div id="watchlist-container" style="display:none; margin-top:40px;">
-                        <div id="anime-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:14px;"></div>
-                    </div>
-                    <div id="mal-placeholder" style="color:#555; font-size:0.6rem; letter-spacing:2px; margin-top:20px;">// awaiting MyAnimeList data</div>
-                </div>
-            </section>
-
             <!-- ===================== F1 JOURNAL ===================== -->
             <section id="f1-journal" class="section">
                 <h2 class="sub-heading">F1 Journal</h2>
-                <p class="typewriter">// 2024 Season — Zandvoort onwards</p>
+                <p class="typewriter">// 2026 Season</p>
                 <div id="f1-races-container" style="margin-top:40px;"></div>
             </section>
 
@@ -3176,11 +3162,6 @@
         // Restore previous bg media setting
         bgMediaEnabled = window.moodTintSavedState !== undefined ? window.moodTintSavedState : true;
         updateMoodBackground(prevMood || currentMood);
-    }
-        if (bgMediaPromptShown) return;
-        bgMediaPromptShown = true;
-        if (sessionStorage.getItem('bgMediaEnabled') !== null) return; // already chosen this session
-        document.getElementById('bg-media-prompt').classList.add('active');
     }
 
     window.setBgMediaEnabled = function(enabled) {
@@ -4093,58 +4074,26 @@
         document.getElementById('eva-character-modal').style.display = 'none';
     };
 
-    // MyAnimeList XML upload handler
-    window.uploadMALXML = function(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const parser = new DOMParser();
-                const xml = parser.parseFromString(e.target.result, 'text/xml');
-                const animeList = xml.querySelectorAll('anime');
-                const grid = document.getElementById('anime-grid');
-                grid.innerHTML = '';
-                animeList.forEach(anime => {
-                    const title = anime.querySelector('series_title')?.textContent || 'Unknown';
-                    const imageUrl = anime.querySelector('series_image')?.textContent || '';
-                    if (imageUrl) {
-                        const card = document.createElement('div');
-                        card.className = 'anime-card';
-                        card.innerHTML = `
-                            <img src="${imageUrl}" alt="${title}" onerror="this.style.display='none'">
-                            <div class="anime-title">${title}</div>
-                        `;
-                        grid.appendChild(card);
-                    }
-                });
-                document.getElementById('watchlist-container').style.display = 'block';
-                document.getElementById('mal-placeholder').textContent = `// ${animeList.length} anime loaded`;
-            } catch (err) {
-                document.getElementById('mal-placeholder').textContent = '// Error parsing XML';
-            }
-        };
-        reader.readAsText(file);
-    };
-
-    // F1 2024 races (Zandvoort onwards) with localStorage for thoughts
+    // F1 2026 races
     const f1Races = [
-        { round: 16, name: 'Dutch GP', circuit: 'Zandvoort', date: 'Sep 1, 2024', fp1: '13:30', fp2: '17:00', fp3: '12:00', quali: '15:00', race: '15:00' },
-        { round: 17, name: 'Italian GP', circuit: 'Monza', date: 'Sep 8, 2024', fp1: '13:30', fp2: '17:00', fp3: '12:00', quali: '16:00', race: '15:00' },
-        { round: 18, name: 'Azerbaijan GP', circuit: 'Baku', date: 'Sep 22, 2024', fp1: '09:30', fp2: '13:00', fp3: '12:00', quali: '15:00', race: '15:00' },
-        { round: 19, name: 'Singapore GP', circuit: 'Marina Bay', date: 'Sep 29, 2024', fp1: '12:30', fp2: '16:00', fp3: '13:30', quali: '17:00', race: '20:00' },
-        { round: 20, name: 'Japanese GP', circuit: 'Suzuka', date: 'Oct 6, 2024', fp1: '02:00', fp2: '06:00', fp3: '05:00', quali: '08:00', race: '14:00' },
-        { round: 21, name: 'Mexico City GP', circuit: 'Autodromo Hermanos', date: 'Oct 20, 2024', fp1: '16:30', fp2: '20:00', fp3: '15:00', quali: '18:00', race: '18:00' },
-        { round: 22, name: 'Brazilian GP', circuit: 'Interlagos', date: 'Nov 3, 2024', fp1: '13:30', fp2: '17:00', fp3: '12:00', quali: '16:00', race: '14:00' },
-        { round: 23, name: 'Las Vegas GP', circuit: 'Las Vegas Street', date: 'Nov 16, 2024', fp1: '22:30', fp2: '02:00', fp3: '22:30', quali: '02:00', race: '22:00' },
-        { round: 24, name: 'Abu Dhabi GP', circuit: 'Yas Marina', date: 'Dec 1, 2024', fp1: '08:30', fp2: '12:00', fp3: '08:30', quali: '12:00', race: '13:00' },
+        { round: 12, name: 'Dutch GP', circuit: 'Circuit Zandvoort', date: 'Aug 21–23, 2026', note: 'Sprint weekend' },
+        { round: 13, name: 'Italian GP', circuit: 'Monza', date: 'Sep 4–6, 2026', note: '' },
+        { round: 14, name: 'Spanish GP', circuit: 'Madring, Madrid', date: 'Sep 11–13, 2026', note: 'New venue on the calendar' },
+        { round: 15, name: 'Azerbaijan GP', circuit: 'Baku City Circuit', date: 'Sep 24–26, 2026', note: 'Race moved to Saturday' },
+        { round: 16, name: 'Singapore GP', circuit: 'Marina Bay Street Circuit', date: 'Oct 9–11, 2026', note: 'Sprint weekend' },
+        { round: 17, name: 'United States GP', circuit: 'Circuit of the Americas, Austin', date: 'Oct 23–25, 2026', note: '' },
+        { round: 18, name: 'Mexico City GP', circuit: 'Autódromo Hermanos Rodríguez', date: 'Oct 30 – Nov 1, 2026', note: '' },
+        { round: 19, name: 'São Paulo GP', circuit: 'Interlagos', date: 'Nov 6–8, 2026', note: 'Sprint weekend' },
+        { round: 20, name: 'Las Vegas GP', circuit: 'Las Vegas Strip Circuit', date: 'Nov 19–21, 2026', note: '' },
+        { round: 21, name: 'Qatar GP', circuit: 'Lusail International Circuit', date: 'Nov 27–29, 2026', note: '' },
+        { round: 22, name: 'Abu Dhabi GP', circuit: 'Yas Marina Circuit', date: 'Dec 4–6, 2026', note: 'Season finale' },
     ];
 
     window.initF1Journal = function() {
         const container = document.getElementById('f1-races-container');
         container.innerHTML = '';
         f1Races.forEach(race => {
-            const storageKey = `f1_race_${race.round}`;
+            const storageKey = `f1_race_${race.round}_2026`;
             const savedThoughts = localStorage.getItem(storageKey) || '';
             const card = document.createElement('div');
             card.className = 'f1-race-card';
@@ -4155,10 +4104,7 @@
                         <div class="f1-race-date">${race.circuit} · ${race.date}</div>
                     </div>
                 </div>
-                <div class="f1-race-result">
-                    FP1: ${race.fp1} | FP2: ${race.fp2}<br>
-                    FP3: ${race.fp3} | Quali: ${race.quali} | Race: ${race.race}
-                </div>
+                ${race.note ? `<div class="f1-race-result">${race.note}</div>` : ''}
                 <div class="f1-race-thoughts">
                     <textarea id="f1-thoughts-${race.round}" placeholder="Your thoughts after the race...">${savedThoughts}</textarea>
                 </div>
