@@ -785,15 +785,35 @@
         .anime-card img { width:100%; display:block; border:1px solid #222; transition:border-color 0.3s; }
         .anime-card:hover img { border-color:var(--color-accent-blue); }
         .anime-title { font-size:0.5rem; color:#666; margin-top:6px; font-family:var(--font-mono); }
-        .f1-race-card { background:#000; border:1px solid #222; padding:20px; margin-bottom:20px; }
-        .f1-race-header { display:flex; justify-content:space-between; margin-bottom:12px; }
-        .f1-race-name { font-size:0.7rem; letter-spacing:2px; color:#aaa; font-weight:700; }
-        .f1-race-date { font-size:0.5rem; color:#555; }
-        .f1-race-result { font-size:0.55rem; color:#888; margin:8px 0; font-family:var(--font-mono); }
-        .f1-race-thoughts textarea { background:#000; border:1px solid #222; color:#888; padding:8px; width:100%; min-height:80px; font-family:var(--font-mono); font-size:0.55rem; }
-        .f1-race-thoughts textarea:focus { outline:none; border-color:var(--color-accent-blue); }
 
-        
+        .f1-gp-grid { display:flex; flex-wrap:wrap; gap:14px; }
+        .f1-gp-box {
+            background:#000; border:1px solid #222; padding:20px 26px; cursor:pointer;
+            min-width:220px; transition:border-color 0.3s, background 0.3s;
+            font-family: var(--font-mono);
+        }
+        .f1-gp-box:hover { border-color:var(--color-accent-blue); background:rgba(0,255,255,0.04); }
+        .f1-gp-round { font-size:0.5rem; color:#555; letter-spacing:2px; margin-bottom:6px; }
+        .f1-gp-name { font-size:0.8rem; color:#ccc; font-weight:700; letter-spacing:1px; margin-bottom:6px; }
+        .f1-gp-date { font-size:0.52rem; color:#666; letter-spacing:1px; }
+        .f1-gp-box.f1-gp-done { opacity:0.55; }
+
+        .f1-detail-popup {
+            background:#0a0a0a; border:1px solid #222; padding:36px; max-width:640px; width:90%;
+            max-height:85vh; overflow-y:auto; position:relative; box-shadow:0 0 30px rgba(0,0,0,0.8);
+        }
+        .f1-detail-round { font-size:0.55rem; color:#555; letter-spacing:3px; margin-bottom:6px; }
+        .f1-detail-name { font-size:1.3rem; color:var(--color-accent-blue); font-weight:700; letter-spacing:1px; margin-bottom:4px; }
+        .f1-detail-circuit { font-size:0.6rem; color:#777; letter-spacing:1px; margin-bottom:20px; }
+        .f1-detail-row { display:flex; gap:24px; margin-bottom:20px; flex-wrap:wrap; }
+        .f1-detail-stat { font-size:0.52rem; color:#666; }
+        .f1-detail-stat span { display:block; color:#aaa; font-size:0.65rem; margin-top:2px; }
+        .f1-detail-blurb { font-size:0.62rem; color:#888; line-height:1.7; font-family:var(--font-mono); margin-bottom:24px; }
+        .f1-detail-note { font-size:0.55rem; color:var(--color-accent-blue); margin-bottom:20px; }
+        .f1-detail-review-label { font-size:0.55rem; letter-spacing:2px; color:#555; text-transform:uppercase; margin-bottom:8px; }
+        .f1-detail-review textarea { background:#000; border:1px solid #222; color:#aaa; padding:12px; width:100%; min-height:100px; font-family:var(--font-mono); font-size:0.58rem; resize:vertical; }
+        .f1-detail-review textarea:focus { outline:none; border-color:var(--color-accent-blue); }
+
             font-size: 0.75rem; font-weight: 700;
             letter-spacing: 1px; margin-bottom: 5px;
         }
@@ -2198,7 +2218,8 @@
     <div id="landing-ui">
         <div class="landing-logo" onclick="enterDriveMode()"><img src="wabilogo.png" alt="Enter Drive"></div>
         <div class="landing-nav">
-            <a class="landing-link" onclick="enterDriveMode('f1-journal')">F1 Journal</a>
+            <a class="landing-link" onclick="enterDriveMode('mood-genres')">Mood</a>
+            <a class="landing-link" onclick="enterDriveMode('experience')">Archives</a>
         </div>
     </div>
 
@@ -2297,10 +2318,19 @@
 
             <!-- ===================== F1 JOURNAL ===================== -->
             <section id="f1-journal" class="section">
-                <h2 class="sub-heading">F1 Journal</h2>
-                <p class="typewriter">// 2026 Season</p>
-                <div id="f1-races-container" style="margin-top:40px;"></div>
+                <div class="back-btn" onclick="showSection('f1')" style="margin-bottom:20px;">&#8592; Back to F1</div>
+                <h2 class="sub-heading">Race Journal</h2>
+                <p class="typewriter">// 2026 Season — Zandvoort onward. Click a Grand Prix for the full rundown.</p>
+                <div id="f1-races-container" class="f1-gp-grid" style="margin-top:40px;"></div>
             </section>
+
+            <!-- F1 race detail modal -->
+            <div id="f1-detail-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:5000; align-items:center; justify-content:center; overflow-y:auto;">
+                <div class="f1-detail-popup">
+                    <button onclick="closeF1Detail()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#555; font-size:1.4rem; cursor:pointer;">✕</button>
+                    <div id="f1-detail-content"></div>
+                </div>
+            </div>
 
             <!-- ===================== MOOD ===================== -->
             <section id="mood-genres" class="section">
@@ -2427,7 +2457,7 @@
                     <div class="page-header">
                         <div class="back-btn" onclick="showSection('skills')">&#8592; Back</div>
                     </div>
-                    <div class="back-btn f1-journal-btn" title="Journal — coming soon">Journal</div>
+                    <div class="back-btn f1-journal-btn" onclick="showSection('f1-journal')" title="2026 Race Journal">Journal</div>
                 </div>
             </section>
 
@@ -4076,44 +4106,87 @@
 
     // F1 2026 races
     const f1Races = [
-        { round: 12, name: 'Dutch GP', circuit: 'Circuit Zandvoort', date: 'Aug 21–23, 2026', note: 'Sprint weekend' },
-        { round: 13, name: 'Italian GP', circuit: 'Monza', date: 'Sep 4–6, 2026', note: '' },
-        { round: 14, name: 'Spanish GP', circuit: 'Madring, Madrid', date: 'Sep 11–13, 2026', note: 'New venue on the calendar' },
-        { round: 15, name: 'Azerbaijan GP', circuit: 'Baku City Circuit', date: 'Sep 24–26, 2026', note: 'Race moved to Saturday' },
-        { round: 16, name: 'Singapore GP', circuit: 'Marina Bay Street Circuit', date: 'Oct 9–11, 2026', note: 'Sprint weekend' },
-        { round: 17, name: 'United States GP', circuit: 'Circuit of the Americas, Austin', date: 'Oct 23–25, 2026', note: '' },
-        { round: 18, name: 'Mexico City GP', circuit: 'Autódromo Hermanos Rodríguez', date: 'Oct 30 – Nov 1, 2026', note: '' },
-        { round: 19, name: 'São Paulo GP', circuit: 'Interlagos', date: 'Nov 6–8, 2026', note: 'Sprint weekend' },
-        { round: 20, name: 'Las Vegas GP', circuit: 'Las Vegas Strip Circuit', date: 'Nov 19–21, 2026', note: '' },
-        { round: 21, name: 'Qatar GP', circuit: 'Lusail International Circuit', date: 'Nov 27–29, 2026', note: '' },
-        { round: 22, name: 'Abu Dhabi GP', circuit: 'Yas Marina Circuit', date: 'Dec 4–6, 2026', note: 'Season finale' },
+        { round: 12, name: 'Dutch GP', circuit: 'Circuit Zandvoort', date: 'Aug 21–23, 2026', note: 'Sprint weekend',
+          length: '4.259 km', character: 'Old-school and narrow',
+          blurb: 'A short, punchy lap through the dunes with two steeply banked corners — Tarzanbocht and the final banked turn — that let drivers carry serious speed. Tight, twisty, and unforgiving if you get greedy on the kerbs. The crowd here is relentless; orange smoke everywhere.' },
+        { round: 13, name: 'Italian GP', circuit: 'Autodromo Nazionale Monza', date: 'Sep 4–6, 2026', note: '',
+          length: '5.793 km', character: 'The Temple of Speed',
+          blurb: 'The fastest track on the calendar — long straights, low downforce, and slipstream battles into the chicanes. It\'s Ferrari\'s home race, so the Tifosi turn Monza into a sea of red no matter who\'s winning. Pure old-Italian-motorsport romance.' },
+        { round: 14, name: 'Spanish GP', circuit: 'Madring, Madrid', date: 'Sep 11–13, 2026', note: 'New venue on the calendar',
+          length: 'TBC', character: 'Brand new for 2026',
+          blurb: 'Madrid\'s debut on the calendar — a hybrid circuit built around IFEMA, mixing a permanent section with temporary street-style stretches. First time anyone\'s racing here in period, so it\'s a bit of a wildcard weekend.' },
+        { round: 15, name: 'Azerbaijan GP', circuit: 'Baku City Circuit', date: 'Sep 24–26, 2026', note: 'Race moved to Saturday',
+          length: '6.003 km', character: 'Walls, castle streets, and the longest straight on the calendar',
+          blurb: 'A street track of two personalities — a tight, twisting crawl through the old city\'s castle section, then a brutally long straight where top speeds go through the roof. High risk of a Safety Car, high risk of chaos, genuinely unpredictable.' },
+        { round: 16, name: 'Singapore GP', circuit: 'Marina Bay Street Circuit', date: 'Oct 9–11, 2026', note: 'Sprint weekend',
+          length: '~4.94 km', character: 'Night race under the floodlights',
+          blurb: 'Hot, humid, and physically brutal — drivers lose kilos in body weight over a single race. Run entirely under floodlights through the Marina Bay skyline, with bumps and walls that punish the smallest mistake. One of the toughest tracks on the body all season.' },
+        { round: 17, name: 'United States GP', circuit: 'Circuit of the Americas, Austin', date: 'Oct 23–25, 2026', note: '',
+          length: '5.513 km', character: 'Flowing esses, big elevation change',
+          blurb: 'COTA borrows its opening esses from Silverstone and its Turn 8 hairpin from Istanbul, stitched onto a circuit with real elevation change — Turn 1 crests a genuine hill. Great racing, great atmosphere, one of the more universally loved stops on the calendar.' },
+        { round: 18, name: 'Mexico City GP', circuit: 'Autódromo Hermanos Rodríguez', date: 'Oct 30 – Nov 1, 2026', note: '',
+          length: '4.304 km', character: 'Thin air at high altitude',
+          blurb: 'Sitting over 2,200m above sea level, the thin air here changes everything — less drag, less downforce, engines working harder to breathe. The stadium section through the old baseball/velodrome venue, with tens of thousands of fans roaring inside it, is one of the great sights in racing.' },
+        { round: 19, name: 'São Paulo GP', circuit: 'Interlagos', date: 'Nov 6–8, 2026', note: 'Sprint weekend',
+          length: '4.309 km', character: 'Anti-clockwise and unpredictable',
+          blurb: 'Short, undulating, and run anti-clockwise, which messes with drivers\' necks in a different way than usual. Weather here flips on a dime — sunshine to torrential rain inside a lap — and Interlagos has a habit of producing chaotic, title-deciding races.' },
+        { round: 20, name: 'Las Vegas GP', circuit: 'Las Vegas Strip Circuit', date: 'Nov 19–21, 2026', note: '',
+          length: '6.201 km', character: 'Neon, night, and very cold tyres',
+          blurb: 'A late-night street race straight down the Las Vegas Strip, past the fountains and under the lights of every casino on the block. Cold desert nights make tyre warm-up a real problem, and the long straights mean serious top speeds right in front of the cameras.' },
+        { round: 21, name: 'Qatar GP', circuit: 'Lusail International Circuit', date: 'Nov 27–29, 2026', note: '',
+          length: '5.419 km', character: 'Fast, flowing, floodlit',
+          blurb: 'A modern, high-speed circuit with long sweeping corners taken at serious pace, run at night under floodlights in the desert. Physically demanding — this is one of the toughest tracks on tyres and necks on the whole calendar.' },
+        { round: 22, name: 'Abu Dhabi GP', circuit: 'Yas Marina Circuit', date: 'Dec 4–6, 2026', note: 'Season finale',
+          length: '5.281 km', character: 'Twilight finale on the marina',
+          blurb: 'The traditional season closer — a twilight race that starts in daylight and ends under lights, run around the Yas Marina waterfront next to the hotel and the yachts. Title fights have been decided here more than once; it always carries a bit of weight.' },
     ];
 
     window.initF1Journal = function() {
         const container = document.getElementById('f1-races-container');
         container.innerHTML = '';
         f1Races.forEach(race => {
-            const storageKey = `f1_race_${race.round}_2026`;
-            const savedThoughts = localStorage.getItem(storageKey) || '';
-            const card = document.createElement('div');
-            card.className = 'f1-race-card';
-            card.innerHTML = `
-                <div class="f1-race-header">
-                    <div>
-                        <div class="f1-race-name">R${race.round} — ${race.name}</div>
-                        <div class="f1-race-date">${race.circuit} · ${race.date}</div>
-                    </div>
-                </div>
-                ${race.note ? `<div class="f1-race-result">${race.note}</div>` : ''}
-                <div class="f1-race-thoughts">
-                    <textarea id="f1-thoughts-${race.round}" placeholder="Your thoughts after the race...">${savedThoughts}</textarea>
-                </div>
+            const box = document.createElement('div');
+            box.className = 'f1-gp-box';
+            box.onclick = () => openF1Detail(race.round);
+            box.innerHTML = `
+                <div class="f1-gp-round">R${race.round}</div>
+                <div class="f1-gp-name">${race.name}</div>
+                <div class="f1-gp-date">${race.date}</div>
             `;
-            container.appendChild(card);
-            document.getElementById(`f1-thoughts-${race.round}`).addEventListener('input', function() {
-                localStorage.setItem(storageKey, this.value);
-            });
+            container.appendChild(box);
         });
+    };
+
+    window.openF1Detail = function(round) {
+        const race = f1Races.find(r => r.round === round);
+        if (!race) return;
+        const storageKey = `f1_review_${race.round}_2026`;
+        const savedReview = localStorage.getItem(storageKey) || '';
+        const modal = document.getElementById('f1-detail-modal');
+        const content = document.getElementById('f1-detail-content');
+        content.innerHTML = `
+            <div class="f1-detail-round">ROUND ${race.round} · 2026 SEASON</div>
+            <div class="f1-detail-name">${race.name}</div>
+            <div class="f1-detail-circuit">${race.circuit} · ${race.date}</div>
+            <div class="f1-detail-row">
+                <div class="f1-detail-stat">Circuit length<span>${race.length}</span></div>
+                <div class="f1-detail-stat">Character<span>${race.character}</span></div>
+            </div>
+            ${race.note ? `<div class="f1-detail-note">// ${race.note}</div>` : ''}
+            <div class="f1-detail-blurb">${race.blurb}</div>
+            <div class="f1-detail-review">
+                <div class="f1-detail-review-label">My Review</div>
+                <textarea id="f1-review-input" placeholder="Thoughts after the race...">${savedReview}</textarea>
+            </div>
+        `;
+        modal.style.display = 'flex';
+        document.getElementById('f1-review-input').addEventListener('input', function() {
+            localStorage.setItem(storageKey, this.value);
+        });
+    };
+
+    window.closeF1Detail = function() {
+        document.getElementById('f1-detail-modal').style.display = 'none';
     };
 
     // Initialize F1 journal when section is shown
