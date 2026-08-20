@@ -96,14 +96,13 @@
         #drive-content-ui.active { opacity:1; visibility:visible; pointer-events:auto }
 
         .navbar { background-color:rgba(0,0,0,0.95); border-bottom:1px solid var(--color-accent-white); padding:20px 50px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:1000; transition: border-color 0.8s ease; overflow:hidden; position:relative; }
-        /* Miami-exclusive nav rain canvas */
+        /* Nav rain canvas — now runs in every mood, tinted to that mood's accent color */
         #nav-rain-canvas {
             position: absolute; top:0; left:0; width:100%; height:100%;
             pointer-events: none; z-index: 0;
             opacity: 0; transition: opacity 0.6s ease;
         }
-        body.mood-miami #nav-rain-canvas { opacity: 0; }
-        body.mood-miami .navbar:hover #nav-rain-canvas { opacity: 1; }
+        .navbar:hover #nav-rain-canvas { opacity: 1; }
         .navbar > * { position: relative; z-index: 1; }
         .logo-text { font-size:1.4rem; font-weight:700; color:var(--color-accent-blue); text-decoration:none; text-shadow:0 0 8px var(--color-accent-blue); cursor:pointer; transition:color 0.3s, text-shadow 0.3s; font-family:var(--font-heading); letter-spacing:4px; }
         .logo-text:hover { color:var(--color-accent-white); text-shadow:0 0 14px var(--color-accent-white) }
@@ -707,12 +706,13 @@
             font-family: var(--font-heading);
         }
         .eva-review-body {
-            font-size: 0.95rem; color: #9a6a88;
-            line-height: 2; letter-spacing: 0.3px;
+            font-size: 0.88rem; color: #a878a0;
+            line-height: 1.85; letter-spacing: 0.2px;
+            font-weight: 400;
             margin-bottom: 30px;
         }
         .eva-review-body p { margin-bottom: 18px; }
-        .eva-review-body em { color: #ff88cc; font-style: normal; }
+        .eva-review-body em { color: #e0a8cc; font-style: normal; font-weight: 500; }
         .eva-section-heading {
             font-size: 0.52rem; letter-spacing: 5px;
             color: #8844aa; text-transform: uppercase;
@@ -731,9 +731,9 @@
             background: rgba(204,68,255,0.04);
         }
         .eva-quote-block p {
-            font-size: 1rem; color: #bb66ee;
-            font-style: italic; line-height: 1.8;
-            margin-bottom: 6px;
+            font-size: 0.82rem; color: #bb66ee;
+            font-style: italic; line-height: 1.75;
+            margin-bottom: 6px; font-weight: 400;
         }
         .eva-quote-block span {
             font-size: 0.58rem; color: #7a3880;
@@ -746,27 +746,125 @@
         }
         .eva-char-card {
             background: rgba(15,2,20,0.85);
-            border: 1px solid #3a1050;
-            padding: 14px;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            border: 1px solid #2a0c3a;
+            border-bottom: 2px solid #6a2088;
+            padding: 14px 16px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
         }
+        .eva-char-card::before {
+            content: '';
+            position: absolute; top:0; left:-100%; width:100%; height:100%;
+            background: linear-gradient(90deg, transparent, rgba(204,68,255,0.06), transparent);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+        .eva-char-card:hover::before { left: 100%; }
         .eva-char-card:hover {
             border-color: #cc44ff;
-            box-shadow: 0 0 12px rgba(204,68,255,0.2);
+            background: rgba(204,68,255,0.03);
+            box-shadow: 0 0 12px rgba(204,68,255,0.15);
+        }
+        /* "back to list" link inside the character popup, when opened via Others */
+        .eva-char-back {
+            cursor: pointer;
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+            font-family: var(--font-mono);
+        }
+        .eva-char-back:hover { color: var(--color-accent-blue); }
+        /* Section headings (First Impressions / The Story / Final Verdict) — read-only, open the review popup */
+        .eva-editable-heading { cursor: pointer; }
+        .eva-editable-heading:hover { color: #cc44ff; }
+        .eva-edit-hint {
+            font-size: 0.46rem;
+            opacity: 0.4;
+            margin-left: 8px;
+            text-transform: none;
+            letter-spacing: 1px;
+            font-style: italic;
         }
         .eva-char-others { cursor: pointer; }
         .eva-char-others:hover { border-color: #00ffff; box-shadow: 0 0 12px rgba(0,255,255,0.2); }
+
+        /* Review popup — same DNA as the watchlist detail card (.wl-detail-popup), tuned to the eva palette */
         .eva-char-popup {
-            background: #0a0a0a;
-            border: 1px solid #222;
-            padding: 32px;
+            background: linear-gradient(180deg, #0d0510 0%, #0a0308 100%);
+            border: 1px solid #26102f;
+            border-top: 2px solid #cc44ff;
+            padding: 34px 34px 32px;
             max-width: 600px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            position: relative;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 20px 60px rgba(0,0,0,0.85), 0 0 40px rgba(204,68,255,0.08);
+            animation: popup-rise 0.28s cubic-bezier(0.16,1,0.3,1);
         }
-        .eva-modal-header { margin-bottom: 24px; position: relative; }
+        .eva-char-popup::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(204,68,255,0.55), transparent);
+        }
+        .eva-modal-close {
+            position: absolute; top: 14px; right: 14px;
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #2a1030;
+            color: #666; font-size: 1rem;
+            cursor: pointer; z-index: 2;
+            font-family: var(--font-mono);
+            transition: border-color 0.25s, color 0.25s, background 0.25s, transform 0.25s;
+        }
+        .eva-modal-close:hover {
+            border-color: #cc44ff; color: #cc44ff;
+            background: rgba(204,68,255,0.08); transform: rotate(90deg);
+        }
+        .eva-modal-header { margin-bottom: 20px; padding-right: 30px; }
+        #eva-modal-char-name {
+            font-size: 0.9rem !important;
+            letter-spacing: 1px;
+            font-family: var(--font-heading);
+            text-shadow: 0 0 18px rgba(204,68,255,0.3);
+        }
+        .eva-modal-subtitle {
+            font-size: 0.5rem; letter-spacing: 3px;
+            color: #8866a0; text-transform: uppercase;
+            margin-top: 8px; font-family: var(--font-mono);
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid #22102a;
+            border-left: 2px solid #cc44ff;
+            display: inline-block;
+        }
+        .eva-review-label {
+            font-size: 0.5rem; letter-spacing: 4px;
+            color: #8866a0; text-transform: uppercase;
+            margin: 22px 0 10px;
+            display: flex; align-items: center; gap: 10px;
+            font-family: var(--font-mono);
+        }
+        .eva-review-label::before {
+            content: '◆'; font-size: 0.4rem; color: #cc44ff; opacity: 0.7;
+        }
+        .eva-review-label::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(90deg, #2a1233, transparent);
+        }
+        .eva-review-label:first-child { margin-top: 0; }
+        .eva-review-text {
+            font-size: 0.85rem; color: #c0b0c8;
+            line-height: 1.8; white-space: pre-wrap;
+            font-family: var(--font-mono);
+            font-weight: 400;
+        }
+        .eva-review-text em { color: #e0a8cc; font-style: normal; }
         #eva-character-list { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
         .eva-char-list-item {
             background: #000;
@@ -779,7 +877,7 @@
             transition: border-color 0.3s, background 0.3s;
             font-family: var(--font-mono);
         }
-        .eva-char-list-item:hover { border-color: var(--color-accent-blue); color: var(--color-accent-blue); background: rgba(0,255,255,0.03); }
+        .eva-char-list-item:hover { border-color: #cc44ff; color: #cc44ff; background: rgba(204,68,255,0.05); }
 
         .anime-card { cursor:pointer; position:relative; }
         .anime-card img { width:100%; display:block; border:1px solid #222; transition:border-color 0.3s; }
@@ -814,17 +912,21 @@
         .f1-detail-review textarea { background:#000; border:1px solid #222; color:#aaa; padding:12px; width:100%; min-height:100px; font-family:var(--font-mono); font-size:0.58rem; resize:vertical; }
         .f1-detail-review textarea:focus { outline:none; border-color:var(--color-accent-blue); }
 
-            font-size: 0.75rem; font-weight: 700;
-            letter-spacing: 1px; margin-bottom: 5px;
+        .eva-char-name {
+            font-size: 0.62rem; font-weight: 700;
+            letter-spacing: 1.5px; margin-bottom: 6px;
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+            opacity: 0.9;
         }
         .eva-char-desc {
-            font-size: 0.65rem; color: #663355;
-            line-height: 1.6;
+            font-size: 0.67rem; color: #7a5570;
+            line-height: 1.65; font-weight: 400;
         }
         .eva-placeholder-note {
-            font-size: 0.58rem; color: #3a1040;
-            letter-spacing: 2px; font-style: italic;
-            margin-top: 8px;
+            font-size: 0.5rem; color: #4a1a55;
+            letter-spacing: 1.5px; font-style: italic;
+            margin-top: 10px;
         }
 
         /* ===================== MINESWEEPER ===================== */
@@ -1875,25 +1977,60 @@
             text-align: center; padding: 60px 0;
         }
 
+        @keyframes popup-rise {
+            0% { opacity: 0; transform: translateY(14px) scale(0.97); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
         /* Detail popup for a single anime */
         .wl-detail-popup {
-            background: #0a0a0a; border: 1px solid #222; padding: 36px;
+            background: linear-gradient(180deg, #0d0d0d 0%, #090909 100%);
+            border: 1px solid #232323;
+            border-top: 2px solid var(--color-accent-blue);
+            padding: 38px 36px 34px;
             max-width: 640px; width: 90%; max-height: 85vh;
             overflow-y: auto; position: relative;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 20px 60px rgba(0,0,0,0.85), 0 0 40px rgba(0,255,255,0.06);
+            animation: popup-rise 0.28s cubic-bezier(0.16,1,0.3,1);
+        }
+        .wl-detail-popup::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,255,255,0.5), transparent);
+        }
+        .wl-detail-close {
+            position: absolute; top: 14px; right: 14px;
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #222;
+            color: #666; font-size: 1rem;
+            cursor: pointer; z-index: 2;
+            font-family: var(--font-mono);
+            transition: border-color 0.25s, color 0.25s, background 0.25s, transform 0.25s;
+        }
+        .wl-detail-close:hover {
+            border-color: var(--color-accent-blue); color: var(--color-accent-blue);
+            background: rgba(0,255,255,0.06); transform: rotate(90deg);
         }
         .wl-detail-title {
             font-size: 1.1rem; color: var(--color-accent-blue);
             font-weight: 700; letter-spacing: 1px;
             margin-bottom: 6px; padding-right: 30px;
             font-family: var(--font-heading);
+            text-shadow: 0 0 18px rgba(0,255,255,0.25);
         }
         .wl-detail-type {
             font-size: 0.55rem; color: #555;
             letter-spacing: 2px; text-transform: uppercase;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
         }
-        .wl-detail-row { display: flex; gap: 24px; margin-bottom: 22px; flex-wrap: wrap; }
+        .wl-detail-row {
+            display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;
+            padding: 16px 18px;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid #1a1a1a;
+            border-left: 2px solid var(--color-accent-blue);
+        }
         .wl-detail-stat { font-size: 0.5rem; color: #555; letter-spacing: 1px; text-transform: uppercase; }
         .wl-detail-stat span { display: block; color: var(--color-accent-blue); font-size: 0.85rem; margin-top: 4px; font-family: var(--font-heading); }
         .wl-detail-label {
@@ -1903,13 +2040,16 @@
             display: flex; align-items: center; gap: 10px;
             font-family: var(--font-mono);
         }
+        .wl-detail-label::before {
+            content: '◆'; font-size: 0.4rem; color: var(--color-accent-blue); opacity: 0.6;
+        }
         .wl-detail-label::after {
             content: ''; flex: 1; height: 1px;
             background: linear-gradient(90deg, #1a1a1a, transparent);
         }
         .wl-detail-note {
-            font-size: 0.65rem; color: #999;
-            line-height: 1.9; white-space: pre-wrap;
+            font-size: 0.82rem; color: #aaa;
+            line-height: 1.85; white-space: pre-wrap;
             font-family: var(--font-mono);
         }
         .wl-detail-note.wl-note-empty { color: #333; font-style: italic; }
@@ -2730,7 +2870,7 @@
                 <!-- Anime detail popup -->
                 <div id="wl-detail-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.96); z-index:6100; align-items:center; justify-content:center; overflow-y:auto;">
                     <div class="wl-detail-popup">
-                        <button onclick="closeWlDetail()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#555; font-size:1.4rem; cursor:pointer; z-index:2;">✕</button>
+                        <button class="wl-detail-close" onclick="closeWlDetail()">✕</button>
                         <div id="wl-detail-content"></div>
                     </div>
                 </div>
@@ -2891,44 +3031,43 @@
 
                     <div class="eva-divider"></div>
 
-                    <div class="eva-section-heading">First Impressions</div>
+                    <div class="eva-section-heading eva-editable-heading" onclick="openEvaSectionNote('first-impressions')">First Impressions <span class="eva-edit-hint">// tap to expand</span></div>
                     <div class="eva-review-body">
-                        <p><em>[Your thoughts here]</em> — This section will be filled with your personal review and impressions of the series.</p>
-                        <p>Add your opening thoughts, what drew you to it, and your initial reaction to the first few episodes.</p>
+                        <p id="eva-first-impressions-text">Went in knowing the ending was infamous and came out understanding why — but not in the way I expected. <em>It's a masterpiece.</em> I already knew this show had a weird ending but I loved it going in.</p>
                     </div>
 
                     <div class="eva-quote-block">
-                        <p>"Your favourite quote from the show goes here."</p>
-                        <span>— Character Name</span>
+                        <p>"I mustn't run away, I mustn't run away."</p>
+                        <span>— Ikari Shinji</span>
                     </div>
 
-                    <div class="eva-section-heading">The Story</div>
+                    <div class="eva-section-heading eva-editable-heading" onclick="openEvaSectionNote('story')">The Story <span class="eva-edit-hint">// tap to expand</span></div>
                     <div class="eva-review-body">
-                        <p><em>[Your story analysis here]</em> — Write about what the show is actually about to you, beyond the surface level mecha premise.</p>
+                        <p id="eva-story-text">Beyond the mecha premise, this is a show about the walls people build to survive being seen. <em>Every episode 25/26 line</em> hits closer the more of yourself you recognize in these characters.</p>
                     </div>
 
                     <div class="eva-divider"></div>
 
                     <div class="eva-section-heading">Characters</div>
                     <div class="eva-char-grid">
-                        <div class="eva-char-card">
+                        <div class="eva-char-card" onclick="showEvaCharacterCard('shinji')">
                             <div class="eva-char-name" style="color:#5af">Ikari Shinji</div>
-                            <div class="eva-char-desc">Your thoughts on Shinji go here.</div>
-                            <div class="eva-placeholder-note">// to fill</div>
+                            <div class="eva-char-desc">A protagonist defined by avoidance — and somehow more honest for it.</div>
+                            <div class="eva-placeholder-note">// tap for full review</div>
                         </div>
-                        <div class="eva-char-card">
+                        <div class="eva-char-card" onclick="showEvaCharacterCard('rei')">
                             <div class="eva-char-name" style="color:#c39">Ayanami Rei</div>
-                            <div class="eva-char-desc">Your thoughts on Rei go here.</div>
-                            <div class="eva-placeholder-note">// to fill</div>
+                            <div class="eva-char-desc">Quiet in a way that says more than dialogue ever could.</div>
+                            <div class="eva-placeholder-note">// tap for full review</div>
                         </div>
-                        <div class="eva-char-card">
+                        <div class="eva-char-card" onclick="showEvaCharacterCard('asuka')">
                             <div class="eva-char-name" style="color:#f55">Soryu Asuka</div>
-                            <div class="eva-char-desc">Your thoughts on Asuka go here.</div>
-                            <div class="eva-placeholder-note">// to fill</div>
+                            <div class="eva-char-desc">Armor as a personality — until the armor is all that's left.</div>
+                            <div class="eva-placeholder-note">// tap for full review</div>
                         </div>
                         <div class="eva-char-card eva-char-others" onclick="showEvaCharacterList()">
                             <div class="eva-char-name" style="color:#ddd">Others</div>
-                            <div class="eva-char-desc">Click to explore more characters</div>
+                            <div class="eva-char-desc">Kaworu, Gendo, Misato, Ritsuko, Kaji.</div>
                             <div class="eva-placeholder-note">// secondary & side characters</div>
                         </div>
                     </div>
@@ -2938,24 +3077,19 @@
                         <div class="eva-char-popup">
                             <div class="eva-modal-header">
                                 <h3 id="eva-modal-char-name" style="color:#2e9; margin:0;">Character Name</h3>
-                                <button onclick="closeEvaCharacterModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#555; font-size:1.4rem; cursor:pointer;">✕</button>
+                                <button class="eva-modal-close" onclick="closeEvaCharacterModal()">✕</button>
                             </div>
                             <div id="eva-modal-char-content">
-                                <img id="eva-modal-char-img" src="" style="max-width:100%; max-height:300px; margin-bottom:20px;">
-                                <div id="eva-modal-char-thoughts"></div>
+                                <!-- filled in dynamically by showEvaCharacterCard() / showEvaCharacterList() / openEvaSectionNote() -->
                             </div>
                         </div>
                     </div>
 
                     <div class="eva-divider" id="eva-after-chars"></div>
 
-                    <div class="eva-section-heading">Final Verdict</div>
+                    <div class="eva-section-heading eva-editable-heading" onclick="openEvaSectionNote('verdict')">Final Verdict <span class="eva-edit-hint">// tap to expand</span></div>
                     <div class="eva-review-body">
-                        <p><em>[Your verdict here]</em> — Sum it up. Would you recommend it? What does it mean to you?</p>
-                    </div>
-
-                    <div class="eva-placeholder-note" style="text-align:center; margin-top:40px; font-size:0.65rem; letter-spacing:3px">
-                        // more content coming soon — this page is a living document
+                        <p id="eva-verdict-text"><em>10/10.</em> Not because it's flawless, but because it's one of the few shows that actually changes depending on where you are in your life when you watch it. Essential.</p>
                     </div>
                 </div>
             </section>
@@ -4403,40 +4537,92 @@
         window.addEventListener('message', onYtMessage);
     };
 
-    // Eva character data (to be filled by user later)
+    // ===================== EVANGELION CHARACTERS — REVIEW BOXES (static, no storage) =====================
+    // "shinji", "rei", "asuka" get their own card up top. Everyone else lives behind "Others".
+    // These are fixed personal reviews — read-only, nothing is saved or edited in the browser.
     const evaCharacters = {
-        kaworu: { name: 'Nagisa Kaworu', color: '#2e9', thoughts: 'Your thoughts on Kaworu go here.', image: '' },
-        gendo: { name: 'Ikari Gendo', color: '#f99', thoughts: 'Your thoughts on Gendo go here.', image: '' },
-        misato: { name: 'Katsuragi Misato', color: '#5af', thoughts: 'Your thoughts on Misato go here.', image: '' },
-        ritsuko: { name: 'Akagi Ritsuko', color: '#fb3', thoughts: 'Your thoughts on Ritsuko go here.', image: '' },
-        kaji: { name: 'Ryoji Kaji', color: '#6cf', thoughts: 'Your thoughts on Kaji go here.', image: '' },
+        shinji:  { name: 'Ikari Shinji',     color: '#5af',
+            tagline: 'Protagonist · Eva Unit-01 Pilot',
+            review: `Everyone clowns on Shinji for being a coward, but I think that's the whole point — he's a kid who was never taught how to want anything for himself. Every time he runs it's because the adults around him gave him zero reason to stay. By the end I wasn't watching a "weak" protagonist, I was watching someone slowly learn that his feelings are allowed to matter. <em>"I mustn't run away"</em> hits different once you realize he's not talking about the Angels.` },
+        rei:     { name: 'Ayanami Rei',      color: '#c39',
+            tagline: 'Eva Unit-00 Pilot · First Child',
+            review: `Rei reads as a blank slate on purpose, and watching her slowly develop a self outside of what she's told to be is one of the quietest, saddest arcs in the show. She barely talks and somehow says more than half the cast. Her arc asks a scary question — how much of "you" is actually yours if everyone around you only wants a version of you that's useful to them?` },
+        asuka:   { name: 'Soryu Asuka',      color: '#f55',
+            tagline: 'Eva Unit-02 Pilot · Second Child',
+            review: `Asuka is all bravado because bravado is the only thing keeping her upright. She needs to be the best pilot because being the best pilot is the one thing that ever made her feel loved. Watching that identity get stripped away piece by piece in the back half is brutal — not because she's humiliated, but because you finally see how much she was hiding underneath it the whole time.` },
     };
+    const evaOtherCharacters = {
+        kaworu:  { name: 'Nagisa Kaworu',    color: '#2e9',
+            tagline: 'Fifth Child · Seventeenth Angel',
+            review: `He's on screen for basically one episode and somehow leaves the biggest scar on the whole series. Kaworu is the only person who ever tells Shinji he's worth loving with zero conditions attached — and the show immediately takes that away from him. Devastating in the most efficient way possible.` },
+        gendo:   { name: 'Ikari Gendo',      color: '#f99',
+            tagline: 'Commander · NERV',
+            review: `A genuinely great "villain" because he's not evil, he's just a broken person who chose grief over his own son and never looked back. Every scene with him is uncomfortable in a very specific way — you can see exactly how someone becomes this, which is somehow worse than if he were just cartoonishly cruel.` },
+        misato:  { name: 'Katsuragi Misato', color: '#5af',
+            tagline: 'Operations Director · NERV',
+            review: `The "cool adult" archetype but written with actual damage underneath the confidence. She's trying to be the stable presence Shinji needs while barely holding herself together, and the show never lets you forget that. One of the more quietly tragic arcs once you clock what she's actually running from.` },
+        ritsuko: { name: 'Akagi Ritsuko',    color: '#fb3',
+            tagline: 'Chief Scientist · NERV',
+            review: `Stuck in the middle of everyone else's mess — Gendo, her mother's legacy, MAGI, all of it — and you can watch the toll it takes on her in real time. Not the flashiest character but every scene she's in adds another layer to how rotten NERV actually is underneath.` },
+        kaji:    { name: 'Ryoji Kaji',       color: '#6cf',
+            tagline: 'Special Agent',
+            review: `Chill on the surface, playing a way more dangerous game underneath than anyone realizes until it's too late. His whole vibe is a nice contrast to how tense everyone else is, which makes it hit harder when the show reminds you nobody in this story gets to just be fine.` },
+    };
+    const evaAllCharacters = Object.assign({}, evaCharacters, evaOtherCharacters);
+    const evaOtherCharKeys = Object.keys(evaOtherCharacters); // shown inside the "Others" list
 
     window.showEvaCharacterList = function() {
-        const modal = document.getElementById('eva-character-modal');
-        const listContainer = document.getElementById('eva-modal-char-content');
+        document.getElementById('eva-modal-char-name').textContent = 'Other Characters';
+        document.getElementById('eva-modal-char-name').style.color = '#ddd';
         let html = '<div id="eva-character-list">';
-        for (const [key, char] of Object.entries(evaCharacters)) {
+        evaOtherCharKeys.forEach(key => {
+            const char = evaOtherCharacters[key];
             html += `<button class="eva-char-list-item" onclick="showEvaCharacterCard('${key}')">${char.name}</button>`;
-        }
+        });
         html += '</div>';
-        listContainer.innerHTML = html;
-        modal.style.display = 'flex';
+        document.getElementById('eva-modal-char-content').innerHTML = html;
+        document.getElementById('eva-character-modal').style.display = 'flex';
     };
 
     window.showEvaCharacterCard = function(charKey) {
-        const char = evaCharacters[charKey];
+        const char = evaAllCharacters[charKey];
         if (!char) return;
         document.getElementById('eva-modal-char-name').textContent = char.name;
         document.getElementById('eva-modal-char-name').style.color = char.color;
-        let content = '';
-        if (char.image) content += `<img src="${char.image}" style="max-width:100%; max-height:300px; margin-bottom:20px;">`;
-        content += `<div style="color:#888; font-size:0.6rem; line-height:1.6; font-family:var(--font-mono);">${char.thoughts}</div>`;
-        document.getElementById('eva-modal-char-content').innerHTML = content;
+        const cameFromOthers = evaOtherCharKeys.includes(charKey);
+        document.getElementById('eva-modal-char-content').innerHTML = `
+            ${cameFromOthers ? '<div class="eva-char-back" onclick="showEvaCharacterList()">&#8592; back to list</div>' : ''}
+            <div class="eva-modal-subtitle">${char.tagline}</div>
+            <div class="eva-review-label">Review</div>
+            <div class="eva-review-text">${char.review}</div>
+        `;
+        document.getElementById('eva-character-modal').style.display = 'flex';
     };
 
     window.closeEvaCharacterModal = function() {
         document.getElementById('eva-character-modal').style.display = 'none';
+    };
+
+    // ===================== EVANGELION SECTION REVIEWS (First Impressions / The Story / Final Verdict) =====================
+    // Clicking these headings pops open the full write-up in the same review-box style as the character cards.
+    const evaSectionNotes = {
+        'first-impressions': { title: 'First Impressions', targetId: 'eva-first-impressions-text' },
+        'story':             { title: 'The Story',         targetId: 'eva-story-text' },
+        'verdict':           { title: 'Final Verdict',     targetId: 'eva-verdict-text' },
+    };
+
+    window.openEvaSectionNote = function(key) {
+        const cfg = evaSectionNotes[key];
+        if (!cfg) return;
+        const el = document.getElementById(cfg.targetId);
+        const currentHtml = el ? el.innerHTML : '';
+        document.getElementById('eva-modal-char-name').textContent = cfg.title;
+        document.getElementById('eva-modal-char-name').style.color = '#cc44ff';
+        document.getElementById('eva-modal-char-content').innerHTML = `
+            <div class="eva-review-label">Review</div>
+            <div class="eva-review-text">${currentHtml}</div>
+        `;
+        document.getElementById('eva-character-modal').style.display = 'flex';
     };
 
     // ===================== WATCHLIST (MAL anime archive) =====================
@@ -5210,12 +5396,19 @@
 
     window.closeWelcomeCard = function() {};  // stub kept for safety
 
-    // ===================== NAV RAIN CANVAS (Miami mode hover) =====================
+    // ===================== NAV RAIN CANVAS (runs in every mood, on hover) =====================
     (function() {
         const canvas = document.getElementById('nav-rain-canvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         let drops = [], animId = null, active = false;
+        // Rain color follows whichever mood is currently active (falls back to cyan)
+        let rainColor = '#00FFFF';
+
+        function currentAccentColor() {
+            const val = getComputedStyle(document.body).getPropertyValue('--color-accent-blue');
+            return val && val.trim() ? val.trim() : '#00FFFF';
+        }
 
         function resize() {
             canvas.width = canvas.offsetWidth || canvas.parentElement.offsetWidth;
@@ -5239,7 +5432,7 @@
         function draw() {
             const W = canvas.width, H = canvas.height;
             ctx.clearRect(0, 0, W, H);
-            ctx.strokeStyle = '#FF2D78';
+            ctx.strokeStyle = rainColor;
             ctx.lineWidth = 0.8;
             drops.forEach(d => {
                 ctx.globalAlpha = d.opacity;
@@ -5260,6 +5453,7 @@
         function startRain() {
             if (active) return;
             active = true;
+            rainColor = currentAccentColor(); // pick up whatever mood is active right now
             resize();
             spawnDrops();
             draw();
@@ -5271,19 +5465,10 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        // Only run in Miami mode, on hover
+        // Runs on hover regardless of mood — color is picked up fresh each time
         const navbar = document.querySelector('.navbar');
-        navbar.addEventListener('mouseenter', () => {
-            if (siteBody.classList.contains('mood-miami')) startRain();
-        });
+        navbar.addEventListener('mouseenter', startRain);
         navbar.addEventListener('mouseleave', stopRain);
-
-        // Stop if mood changes away from Miami
-        const _origSyncMoodButtons = syncMoodButtons;
-        syncMoodButtons = function(mood) {
-            _origSyncMoodButtons(mood);
-            if (mood !== 'miami') stopRain();
-        };
     })();
 
     // ===================== MODE SELECTOR =====================
