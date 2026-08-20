@@ -349,7 +349,7 @@
         }
         .contact-form input::placeholder, .contact-form textarea::placeholder { color:#2a2a2a; letter-spacing:2px; font-size:0.68rem; }
         .contact-form button {
-            background: transparent;
+            background: #000;
             color: var(--color-accent-blue);
             border: 1px solid var(--color-accent-blue);
             padding: 11px 28px;
@@ -515,7 +515,7 @@
         .hack-button {
             display: block;
             width: 100%;
-            background: transparent;
+            background: #000;
             color: var(--color-accent-blue);
             border: 1px solid var(--color-accent-blue);
             padding: 14px 25px;
@@ -607,7 +607,7 @@
         .carousel-btn:hover { background:rgba(0,255,255,0.08); transform:scale(1.1); box-shadow:0 0 12px var(--color-accent-blue) }
 
         /* ===================== BACK BUTTON ===================== */
-        .back-btn { display:inline-block; padding:6px 14px; background:transparent; border:1px solid #2a2a2a; color:#555; text-decoration:none; font-weight:700; transition:all 0.3s; cursor:pointer; font-size:0.58rem; font-family:var(--font-mono); letter-spacing:3px; text-transform:uppercase; }
+        .back-btn { display:inline-block; padding:6px 14px; background:#000; border:1px solid #2a2a2a; color:#555; text-decoration:none; font-weight:700; transition:all 0.3s; cursor:pointer; font-size:0.58rem; font-family:var(--font-mono); letter-spacing:3px; text-transform:uppercase; }
         .back-btn:hover { border-color:var(--color-accent-blue); color:var(--color-accent-blue); background:rgba(0,255,255,0.05); }
 
         /* ===================== DETAIL POPUP ===================== */
@@ -784,7 +784,7 @@
         .sw-title { font-size:2rem; font-weight:700; color:#fff; text-shadow:0 0 16px rgba(0,255,255,0.2); margin-bottom:2px; font-family:var(--font-heading); letter-spacing:4px; }
         .sw-sub { font-size:0.58rem; color:#666; letter-spacing:3px; font-family:var(--font-mono); }
         .sw-mode-tabs { display:flex; gap:0; margin-bottom:14px; border:1px solid #111; }
-        .sw-tab { background:transparent; border:none; color:#888; font-family:var(--font-mono); font-size:0.65rem; padding:8px 20px; cursor:pointer; letter-spacing:2px; text-transform:uppercase; transition:color 0.25s, background 0.25s; border-right:1px solid #0e0e0e; }
+        .sw-tab { background:#000; border:none; color:#888; font-family:var(--font-mono); font-size:0.65rem; padding:8px 20px; cursor:pointer; letter-spacing:2px; text-transform:uppercase; transition:color 0.25s, background 0.25s; border-right:1px solid #0e0e0e; }
         .sw-tab:last-child { border-right:none }
         .sw-tab:hover { background:rgba(0,255,255,0.03); color:var(--color-accent-blue); }
         .sw-tab.active { background:rgba(0,255,255,0.05); color:var(--color-accent-white); box-shadow:inset 0 -2px 0 var(--color-accent-blue); }
@@ -794,10 +794,10 @@
         .sw-hud-val { font-size:1.3rem; font-weight:700; color:var(--color-accent-blue); font-family:var(--font-heading); text-shadow:0 0 8px var(--color-accent-blue); transition:color 0.8s, text-shadow 0.8s; }
         .sw-hud-val.danger { color:#ff4444; text-shadow:0 0 6px #ff4444 }
         .sw-diff { display:flex; gap:6px; margin-bottom:10px }
-        .sw-dbtn { background:transparent; border:1px solid #444; color:#aaa; font-family:var(--font-mono); font-size:0.62rem; padding:5px 14px; cursor:pointer; letter-spacing:2px; text-transform:uppercase; transition:border-color 0.25s, color 0.25s, background 0.25s; }
+        .sw-dbtn { background:#000; border:1px solid #444; color:#aaa; font-family:var(--font-mono); font-size:0.62rem; padding:5px 14px; cursor:pointer; letter-spacing:2px; text-transform:uppercase; transition:border-color 0.25s, color 0.25s, background 0.25s; }
         .sw-dbtn:hover { background:rgba(0,255,255,0.04); border-color:var(--color-accent-blue); color:var(--color-accent-blue); }
         .sw-dbtn.active { background:rgba(0,255,255,0.06); border-color:var(--color-accent-blue); color:var(--color-accent-white); border-bottom:2px solid var(--color-accent-blue); }
-        .sw-reset { background:transparent; border:1px solid #444; color:#aaa; font-family:var(--font-mono); font-size:0.62rem; padding:5px 14px; cursor:pointer; letter-spacing:2px; transition:border-color 0.25s, color 0.25s, background 0.25s; }
+        .sw-reset { background:#000; border:1px solid #444; color:#aaa; font-family:var(--font-mono); font-size:0.62rem; padding:5px 14px; cursor:pointer; letter-spacing:2px; transition:border-color 0.25s, color 0.25s, background 0.25s; }
         .sw-reset:hover { background:rgba(0,255,255,0.04); border-color:var(--color-accent-blue); color:var(--color-accent-blue); }
         .sw-board-wrap { position:relative; margin-bottom:10px }
         .sw-board { display:inline-grid; border:1px solid #1a1a1a; border-bottom:2px solid var(--color-accent-blue); box-shadow:0 0 30px rgba(0,255,255,0.06), inset 0 0 20px rgba(0,0,0,0.6); background:rgba(0,0,0,0.85); padding:3px; gap:1px; transition:border-color 0.8s, box-shadow 0.8s; }
@@ -927,7 +927,7 @@
             text-shadow: 0 0 6px var(--color-accent-blue);
         }
         .sys-lock-dismiss {
-            background: none;
+            background: #000;
             border: 1px solid #222;
             color: #333;
             font-family: var(--font-stack);
@@ -948,17 +948,33 @@
             z-index: 9100;
             align-items: center; justify-content: center;
             backdrop-filter: blur(4px);
+            transition: background 0.6s ease, backdrop-filter 0.6s ease;
         }
         #bg-media-prompt.active { display: flex; animation: flicker 0.3s; }
+        #bg-media-prompt.bmp-preview-dim { background: rgba(0,0,0,0.12); backdrop-filter: none; }
         .bmp-actions { display:flex; gap:14px; justify-content:center; margin-top:8px; }
         .bmp-btn {
-            background: none; border: 1px solid #222; color: #555;
+            background: #000; border: 1px solid #222; color: #555;
             font-family: var(--font-stack); font-size: 0.6rem;
             letter-spacing: 3px; padding: 8px 22px; cursor: pointer;
-            text-transform: uppercase; transition: all 0.3s;
+            text-transform: uppercase; transition: all 0.3s, opacity 0.5s ease;
         }
         .bmp-btn:hover { border-color: var(--color-accent-blue); color: var(--color-accent-blue); }
         .bmp-btn.bmp-yes { border-color: var(--color-accent-blue); color: var(--color-accent-blue); }
+        #bg-media-prompt .sys-lock-icon,
+        #bg-media-prompt .sys-lock-title,
+        #bg-media-prompt .sys-lock-sub,
+        #bg-media-prompt .sys-lock-hint { transition: opacity 0.6s ease; }
+
+        #bmp-confirm {
+            display: none;
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.92);
+            z-index: 9200;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        #bmp-confirm.active { display: flex; animation: flicker 0.3s; }
 
         /* ===================== SYSTEM PANEL (navbar dropdown) ===================== */
         .nav-system-wrap {
@@ -1009,7 +1025,7 @@
             width: 100%;
             padding: 8px 14px;
             text-align: left;
-            background: transparent;
+            background: #000;
             border: 1px solid transparent;
             font-family: var(--font-mono);
             font-size: 0.65rem;
@@ -1096,6 +1112,21 @@
             display: flex; flex-direction: column; gap: 3px;
             margin-bottom: 50px;
         }
+        .genre-grid {
+            display: flex; flex-wrap: wrap; gap: 14px;
+            margin-top: 30px; margin-bottom: 50px;
+        }
+        .genre-card {
+            background: #000; border: 1px solid var(--color-subtle-border);
+            color: var(--color-text-primary); padding: 18px 24px;
+            font-family: var(--font-mono); cursor: pointer;
+            min-width: 220px; transition: border-color 0.3s, background 0.3s;
+        }
+        .genre-card:hover { border-color: var(--color-accent-blue); background: rgba(0,255,255,0.05); }
+        .genre-name { font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 6px; }
+        .genre-count { font-size: 0.5rem; color: #555; letter-spacing: 2px; text-transform: uppercase; }
+        .genre-card.genre-locked { cursor: default; opacity: 0.4; }
+        .genre-card.genre-locked:hover { border-color: var(--color-subtle-border); background: #000; }
         .song-row {
             display: flex; align-items: center; gap: 20px;
             padding: 16px 20px;
@@ -1242,7 +1273,7 @@
             display: flex; align-items: center; gap: 8px;
         }
         .mcc-btn {
-            background: none; border: 1px solid var(--color-accent-blue);
+            background: #000; border: 1px solid var(--color-accent-blue);
             color: var(--color-accent-blue); font-size: 0.75rem;
             width: 26px; height: 26px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
@@ -1299,7 +1330,7 @@
         }
         .lofi-card-btn {
             display: block; width: 100%;
-            background: transparent;
+            background: #000;
             border: 1px solid var(--color-accent-blue);
             color: var(--color-accent-blue);
             font-family: var(--font-mono);
@@ -1395,7 +1426,7 @@
         }
         .mpt-btns { display: flex; gap: 10px; }
         .mpt-btn {
-            background: transparent; border: 1px solid;
+            background: #000; border: 1px solid;
             font-family: var(--font-stack); font-size: 0.65rem;
             letter-spacing: 3px; text-transform: uppercase;
             padding: 11px 22px; cursor: pointer; transition: all 0.25s;
@@ -1491,7 +1522,7 @@
             margin-bottom: 40px;
         }
         .japan-tab {
-            background: transparent;
+            background: #000;
             border: none;
             border-bottom: 2px solid transparent;
             color: #333;
@@ -1692,7 +1723,7 @@
         .ms-btn-wistful:hover, .ms-btn-wistful.ms-selected { border-color: #8BA7C7; box-shadow: 0 0 14px rgba(139,167,199,0.1); }
         .ms-enter-btn {
             margin-top: 28px;
-            background: transparent;
+            background: #000;
             border: 1px solid #444;
             color: #888; padding: 12px 32px;
             font-family: var(--font-mono); font-size: 0.6rem;
@@ -1742,7 +1773,7 @@
             color: #5a2a4a; line-height: 1.8; margin-bottom: 22px;
         }
         .mw-continue-btn {
-            width: 100%; background: transparent;
+            width: 100%; background: #000;
             border: 1px solid #FF2D78; color: #FF2D78;
             padding: 13px; font-family: var(--font-mono);
             font-size: 0.62rem; letter-spacing: 4px;
@@ -2135,9 +2166,19 @@
                 for this mode, or use a plain colour tint instead?
             </div>
             <div class="bmp-actions">
-                <button class="bmp-btn bmp-yes" onclick="setBgMediaEnabled(true)">Keep it</button>
-                <button class="bmp-btn" onclick="setBgMediaEnabled(false)">No, tint only</button>
+                <button class="bmp-btn bmp-yes" onclick="setBgMediaEnabled(true)" onmouseenter="bmpHoverPreview(true,this)" onmouseleave="bmpHoverPreviewEnd()">Keep it</button>
+                <button class="bmp-btn" onclick="setBgMediaEnabled(false)" onmouseenter="bmpHoverPreview(false,this)" onmouseleave="bmpHoverPreviewEnd()">No, tint only</button>
             </div>
+        </div>
+    </div>
+
+    <!-- confirmation after choosing background media preference -->
+    <div id="bmp-confirm">
+        <div class="sys-lock-box">
+            <span class="sys-lock-icon">⬡</span>
+            <div class="sys-lock-title">Got It</div>
+            <div class="sys-lock-hint">You can toggle this anytime in the System section.</div>
+            <button class="sys-lock-dismiss" onclick="document.getElementById('bmp-confirm').classList.remove('active')">Okay</button>
         </div>
     </div>
 
@@ -2145,7 +2186,7 @@
     <div id="landing-ui">
         <div class="landing-logo" onclick="enterDriveMode()"><img src="wabilogo.png" alt="Enter Drive"></div>
         <div class="landing-nav">
-            <a class="landing-link" onclick="enterDriveMode('skills')">Mood</a>
+            <a class="landing-link" onclick="enterDriveMode('mood-genres')">Mood</a>
             <a class="landing-link" onclick="enterDriveMode('experience')">Archives</a>
         </div>
     </div>
@@ -2239,6 +2280,46 @@
                             <div class="song-artist">Justin Bieber</div>
                         </div>
                         <div class="song-duration">3:50</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================== MOOD (landing entry — separate from Transmissions) ===================== -->
+            <section id="mood-genres" class="section">
+                <h2 class="sub-heading">Mood</h2>
+                <p class="typewriter">// Pick a genre to drop into a track</p>
+                <div class="genre-grid">
+                    <div class="genre-card" onclick="playSong(0)">
+                        <div class="genre-name">J-Pop / City Pop</div>
+                        <div class="genre-count">Odoriko — Vaundy</div>
+                    </div>
+                    <div class="genre-card" onclick="playSong(1)">
+                        <div class="genre-name">Indie Folk</div>
+                        <div class="genre-count">Riptide — Vance Joy</div>
+                    </div>
+                    <div class="genre-card" onclick="playSong(2)">
+                        <div class="genre-name">Pop / R&amp;B</div>
+                        <div class="genre-count">Confirmations — Justin Bieber</div>
+                    </div>
+                    <div class="genre-card genre-locked">
+                        <div class="genre-name">Lo-fi</div>
+                        <div class="genre-count">Coming soon</div>
+                    </div>
+                    <div class="genre-card genre-locked">
+                        <div class="genre-name">Synthwave</div>
+                        <div class="genre-count">Coming soon</div>
+                    </div>
+                    <div class="genre-card genre-locked">
+                        <div class="genre-name">Ambient</div>
+                        <div class="genre-count">Coming soon</div>
+                    </div>
+                    <div class="genre-card genre-locked">
+                        <div class="genre-name">Rock</div>
+                        <div class="genre-count">Coming soon</div>
+                    </div>
+                    <div class="genre-card genre-locked">
+                        <div class="genre-name">Hip-Hop</div>
+                        <div class="genre-count">Coming soon</div>
                     </div>
                 </div>
             </section>
@@ -3037,11 +3118,35 @@
         document.getElementById('bg-media-prompt').classList.add('active');
     }
 
+    window.bmpHoverPreview = function(enabled, btnEl) {
+        const box = document.querySelector('#bg-media-prompt .sys-lock-box');
+        const overlay = document.getElementById('bg-media-prompt');
+        box.querySelectorAll('.sys-lock-icon, .sys-lock-title, .sys-lock-sub, .sys-lock-hint, .bmp-btn').forEach(el => {
+            el.style.opacity = (el === btnEl) ? '1' : '0';
+        });
+        overlay.classList.add('bmp-preview-dim');
+        const saved = bgMediaEnabled;
+        bgMediaEnabled = enabled;
+        updateMoodBackground(currentMood);
+        bgMediaEnabled = saved;
+    };
+    window.bmpHoverPreviewEnd = function() {
+        const box = document.querySelector('#bg-media-prompt .sys-lock-box');
+        const overlay = document.getElementById('bg-media-prompt');
+        box.querySelectorAll('.sys-lock-icon, .sys-lock-title, .sys-lock-sub, .sys-lock-hint, .bmp-btn').forEach(el => {
+            el.style.opacity = '';
+        });
+        overlay.classList.remove('bmp-preview-dim');
+        updateMoodBackground(currentMood);
+    };
+
     window.setBgMediaEnabled = function(enabled) {
+        const promptWasActive = document.getElementById('bg-media-prompt').classList.contains('active');
         bgMediaEnabled = enabled;
         bgMediaPromptShown = true;
         sessionStorage.setItem('bgMediaEnabled', enabled ? 'true' : 'false');
         document.getElementById('bg-media-prompt').classList.remove('active');
+        bmpHoverPreviewEnd();
         const statusEl = document.getElementById('bg-media-status');
         if (statusEl) statusEl.textContent = enabled ? 'On' : 'Off';
         const yesBtn = document.getElementById('bg-media-toggle-yes'),
@@ -3051,6 +3156,9 @@
             noBtn.classList.toggle('bmp-yes', !enabled);
         }
         if (hasStarted) updateMoodBackground(currentMood);
+        if (promptWasActive) {
+            setTimeout(() => document.getElementById('bmp-confirm').classList.add('active'), 350);
+        }
     };
 
     function getAccentForMood(mood) {
@@ -4517,7 +4625,7 @@
                 if (currentMood === 'miami') {
                     document.getElementById('miami-welcome').classList.add('active');
                 } else {
-                    setTimeout(maybeShowBgMediaPrompt, 1400);
+                    setTimeout(maybeShowBgMediaPrompt, 5000);
                 }
             });
         }, 700);
@@ -4537,7 +4645,7 @@
         updateMoodBackground('miami');
         playMoodMusic('miami');
         updateMusicCard('miami', true);
-        setTimeout(maybeShowBgMediaPrompt, 900);
+        setTimeout(maybeShowBgMediaPrompt, 5000);
     };
 
     // Also show Miami welcome after affirming Miami via mood prompt
