@@ -754,7 +754,46 @@
             border-color: #cc44ff;
             box-shadow: 0 0 12px rgba(204,68,255,0.2);
         }
-        .eva-char-name {
+        .eva-char-others { cursor: pointer; }
+        .eva-char-others:hover { border-color: #00ffff; box-shadow: 0 0 12px rgba(0,255,255,0.2); }
+        .eva-char-popup {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+        .eva-modal-header { margin-bottom: 24px; position: relative; }
+        #eva-character-list { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+        .eva-char-list-item {
+            background: #000;
+            border: 1px solid #222;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+            color: #555;
+            transition: border-color 0.3s, background 0.3s;
+            font-family: var(--font-mono);
+        }
+        .eva-char-list-item:hover { border-color: var(--color-accent-blue); color: var(--color-accent-blue); background: rgba(0,255,255,0.03); }
+
+        .anime-card { cursor:pointer; position:relative; }
+        .anime-card img { width:100%; display:block; border:1px solid #222; transition:border-color 0.3s; }
+        .anime-card:hover img { border-color:var(--color-accent-blue); }
+        .anime-title { font-size:0.5rem; color:#666; margin-top:6px; font-family:var(--font-mono); }
+        .f1-race-card { background:#000; border:1px solid #222; padding:20px; margin-bottom:20px; }
+        .f1-race-header { display:flex; justify-content:space-between; margin-bottom:12px; }
+        .f1-race-name { font-size:0.7rem; letter-spacing:2px; color:#aaa; font-weight:700; }
+        .f1-race-date { font-size:0.5rem; color:#555; }
+        .f1-race-result { font-size:0.55rem; color:#888; margin:8px 0; font-family:var(--font-mono); }
+        .f1-race-thoughts textarea { background:#000; border:1px solid #222; color:#888; padding:8px; width:100%; min-height:80px; font-family:var(--font-mono); font-size:0.55rem; }
+        .f1-race-thoughts textarea:focus { outline:none; border-color:var(--color-accent-blue); }
+
+        
             font-size: 0.75rem; font-weight: 700;
             letter-spacing: 1px; margin-bottom: 5px;
         }
@@ -2155,39 +2194,12 @@
         </div>
     </div>
 
-    <!-- background media (gif/video) keep/remove prompt -->
-    <div id="bg-media-prompt">
-        <div class="sys-lock-box">
-            <span class="sys-lock-icon">⬡</span>
-            <div class="sys-lock-title">Background Media</div>
-            <div class="sys-lock-sub">// Animated gif / video</div>
-            <div class="sys-lock-hint">
-                Keep the animated gif/video background<br>
-                for this mode, or use a plain colour tint instead?
-            </div>
-            <div class="bmp-actions">
-                <button class="bmp-btn bmp-yes" onclick="setBgMediaEnabled(true)" onmouseenter="bmpHoverPreview(true,this)" onmouseleave="bmpHoverPreviewEnd()">Keep it</button>
-                <button class="bmp-btn" onclick="setBgMediaEnabled(false)" onmouseenter="bmpHoverPreview(false,this)" onmouseleave="bmpHoverPreviewEnd()">No, tint only</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- confirmation after choosing background media preference -->
-    <div id="bmp-confirm">
-        <div class="sys-lock-box">
-            <span class="sys-lock-icon">⬡</span>
-            <div class="sys-lock-title">Got It</div>
-            <div class="sys-lock-hint">You can toggle this anytime in the System section.</div>
-            <button class="sys-lock-dismiss" onclick="document.getElementById('bmp-confirm').classList.remove('active')">Okay</button>
-        </div>
-    </div>
-
     <!-- ===================== LANDING UI ===================== -->
     <div id="landing-ui">
         <div class="landing-logo" onclick="enterDriveMode()"><img src="wabilogo.png" alt="Enter Drive"></div>
         <div class="landing-nav">
-            <a class="landing-link" onclick="enterDriveMode('mood-genres')">Mood</a>
-            <a class="landing-link" onclick="enterDriveMode('experience')">Archives</a>
+            <a class="landing-link" onclick="enterDriveMode('watchlist')">Watchlist</a>
+            <a class="landing-link" onclick="enterDriveMode('f1-journal')">F1 Journal</a>
         </div>
     </div>
 
@@ -2284,7 +2296,27 @@
                 </div>
             </section>
 
-            <!-- ===================== MOOD (landing entry — separate from Transmissions) ===================== -->
+            <!-- ===================== WATCHLIST (MyAnimeList) ===================== -->
+            <section id="watchlist" class="section">
+                <h2 class="sub-heading">Watchlist</h2>
+                <p class="typewriter">// Upload your MyAnimeList.xml to populate this section</p>
+                <div style="margin-top:30px;">
+                    <input type="file" id="mal-xml-upload" accept=".xml" onchange="uploadMALXML(event)" style="padding:10px; background:#000; border:1px solid #222; color:#555; font-family:var(--font-mono); cursor:pointer;">
+                    <div id="watchlist-container" style="display:none; margin-top:40px;">
+                        <div id="anime-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:14px;"></div>
+                    </div>
+                    <div id="mal-placeholder" style="color:#555; font-size:0.6rem; letter-spacing:2px; margin-top:20px;">// awaiting MyAnimeList data</div>
+                </div>
+            </section>
+
+            <!-- ===================== F1 JOURNAL ===================== -->
+            <section id="f1-journal" class="section">
+                <h2 class="sub-heading">F1 Journal</h2>
+                <p class="typewriter">// 2024 Season — Zandvoort onwards</p>
+                <div id="f1-races-container" style="margin-top:40px;"></div>
+            </section>
+
+            <!-- ===================== MOOD ===================== -->
             <section id="mood-genres" class="section">
                 <h2 class="sub-heading">Mood</h2>
                 <p class="typewriter">// Pick a genre to drop into a track</p>
@@ -2543,14 +2575,28 @@
                             <div class="eva-char-desc">Your thoughts on Asuka go here.</div>
                             <div class="eva-placeholder-note">// to fill</div>
                         </div>
-                        <div class="eva-char-card">
-                            <div class="eva-char-name" style="color:#2e9">Nagisa Kaworu</div>
-                            <div class="eva-char-desc">Your thoughts on Kaworu go here.</div>
-                            <div class="eva-placeholder-note">// to fill</div>
+                        <div class="eva-char-card eva-char-others" onclick="showEvaCharacterList()">
+                            <div class="eva-char-name" style="color:#ddd">Others</div>
+                            <div class="eva-char-desc">Click to explore more characters</div>
+                            <div class="eva-placeholder-note">// secondary & side characters</div>
                         </div>
                     </div>
 
-                    <div class="eva-divider"></div>
+                    <!-- Character modal popup -->
+                    <div id="eva-character-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:5000; align-items:center; justify-content:center; overflow-y:auto;">
+                        <div class="eva-char-popup">
+                            <div class="eva-modal-header">
+                                <h3 id="eva-modal-char-name" style="color:#2e9; margin:0;">Character Name</h3>
+                                <button onclick="closeEvaCharacterModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#555; font-size:1.4rem; cursor:pointer;">✕</button>
+                            </div>
+                            <div id="eva-modal-char-content">
+                                <img id="eva-modal-char-img" src="" style="max-width:100%; max-height:300px; margin-bottom:20px;">
+                                <div id="eva-modal-char-thoughts"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="eva-divider" id="eva-after-chars"></div>
 
                     <div class="eva-section-heading">Final Verdict</div>
                     <div class="eva-review-body">
@@ -2859,7 +2905,9 @@
         curVideo='background.mp4',
         konamiCode=[],konamiSeq=['o','m','o','t','e','n','a','s','h','i'];
     let bgMediaEnabled=sessionStorage.getItem('bgMediaEnabled')!=='false',
-        bgMediaPromptShown=false;
+        bgMediaPromptShown=false,
+        moodTintActive=false,
+        prevMood=null;
     let curCarousel='tv',curSlide=0;
     const codeDigits=document.querySelectorAll('.code-input-digit'),
           codeDisplay=document.getElementById('code-display'),
@@ -3111,42 +3159,33 @@
     // kept as an alias — older code below still calls loadMoodYtBg(mood)
     function loadMoodYtBg(mood) { updateMoodBackground(mood); }
 
-    function maybeShowBgMediaPrompt() {
+    function applyMoodTintOverlay() {
+        if (moodTintActive) return;
+        moodTintActive = true;
+        prevMood = currentMood;
+        // Force tint-only mode temporarily
+        const savedBgMedia = bgMediaEnabled;
+        bgMediaEnabled = false;
+        updateMoodBackground(currentMood);
+        window.moodTintSavedState = savedBgMedia;
+    }
+
+    function removeMoodTintOverlay() {
+        if (!moodTintActive) return;
+        moodTintActive = false;
+        // Restore previous bg media setting
+        bgMediaEnabled = window.moodTintSavedState !== undefined ? window.moodTintSavedState : true;
+        updateMoodBackground(prevMood || currentMood);
+    }
         if (bgMediaPromptShown) return;
         bgMediaPromptShown = true;
         if (sessionStorage.getItem('bgMediaEnabled') !== null) return; // already chosen this session
         document.getElementById('bg-media-prompt').classList.add('active');
     }
 
-    window.bmpHoverPreview = function(enabled, btnEl) {
-        const box = document.querySelector('#bg-media-prompt .sys-lock-box');
-        const overlay = document.getElementById('bg-media-prompt');
-        box.querySelectorAll('.sys-lock-icon, .sys-lock-title, .sys-lock-sub, .sys-lock-hint, .bmp-btn').forEach(el => {
-            el.style.opacity = (el === btnEl) ? '1' : '0';
-        });
-        overlay.classList.add('bmp-preview-dim');
-        const saved = bgMediaEnabled;
-        bgMediaEnabled = enabled;
-        updateMoodBackground(currentMood);
-        bgMediaEnabled = saved;
-    };
-    window.bmpHoverPreviewEnd = function() {
-        const box = document.querySelector('#bg-media-prompt .sys-lock-box');
-        const overlay = document.getElementById('bg-media-prompt');
-        box.querySelectorAll('.sys-lock-icon, .sys-lock-title, .sys-lock-sub, .sys-lock-hint, .bmp-btn').forEach(el => {
-            el.style.opacity = '';
-        });
-        overlay.classList.remove('bmp-preview-dim');
-        updateMoodBackground(currentMood);
-    };
-
     window.setBgMediaEnabled = function(enabled) {
-        const promptWasActive = document.getElementById('bg-media-prompt').classList.contains('active');
         bgMediaEnabled = enabled;
-        bgMediaPromptShown = true;
         sessionStorage.setItem('bgMediaEnabled', enabled ? 'true' : 'false');
-        document.getElementById('bg-media-prompt').classList.remove('active');
-        bmpHoverPreviewEnd();
         const statusEl = document.getElementById('bg-media-status');
         if (statusEl) statusEl.textContent = enabled ? 'On' : 'Off';
         const yesBtn = document.getElementById('bg-media-toggle-yes'),
@@ -3156,9 +3195,6 @@
             noBtn.classList.toggle('bmp-yes', !enabled);
         }
         if (hasStarted) updateMoodBackground(currentMood);
-        if (promptWasActive) {
-            setTimeout(() => document.getElementById('bmp-confirm').classList.add('active'), 350);
-        }
     };
 
     function getAccentForMood(mood) {
@@ -3434,6 +3470,8 @@
             });
         }
         driveUI.scrollTo({top:0,behavior:'smooth'});
+        // Remove mood tint if leaving mood-genres section
+        if(id!=='mood-genres'&&moodTintActive){removeMoodTintOverlay();}
         // load eva youtube bg when entering evangelion section
         if(id==='evangelion'){
             const iframe=document.getElementById('eva-yt-iframe');
@@ -3448,6 +3486,7 @@
                 iframe.src='https://www.youtube.com/embed/RkpQvhg-IWw?autoplay=1&mute=1&loop=1&playlist=RkpQvhg-IWw&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3';
             }
         }
+        if(id==='mood-genres'){applyMoodTintOverlay();}
         if(id==='minesweeper-hormuz'){initSweep();}
         if(id==='star-map'){setTimeout(initStarMap,60);}
         if(id==='freq-dial'){setTimeout(initFreqDial,60);}
@@ -4016,6 +4055,126 @@
         window._mvEnded = false;
         window.removeEventListener('message', onYtMessage);
         window.addEventListener('message', onYtMessage);
+    };
+
+    // Eva character data (to be filled by user later)
+    const evaCharacters = {
+        kaworu: { name: 'Nagisa Kaworu', color: '#2e9', thoughts: 'Your thoughts on Kaworu go here.', image: '' },
+        gendo: { name: 'Ikari Gendo', color: '#f99', thoughts: 'Your thoughts on Gendo go here.', image: '' },
+        misato: { name: 'Katsuragi Misato', color: '#5af', thoughts: 'Your thoughts on Misato go here.', image: '' },
+        ritsuko: { name: 'Akagi Ritsuko', color: '#fb3', thoughts: 'Your thoughts on Ritsuko go here.', image: '' },
+        kaji: { name: 'Ryoji Kaji', color: '#6cf', thoughts: 'Your thoughts on Kaji go here.', image: '' },
+    };
+
+    window.showEvaCharacterList = function() {
+        const modal = document.getElementById('eva-character-modal');
+        const listContainer = document.getElementById('eva-modal-char-content');
+        let html = '<div id="eva-character-list">';
+        for (const [key, char] of Object.entries(evaCharacters)) {
+            html += `<button class="eva-char-list-item" onclick="showEvaCharacterCard('${key}')">${char.name}</button>`;
+        }
+        html += '</div>';
+        listContainer.innerHTML = html;
+        modal.style.display = 'flex';
+    };
+
+    window.showEvaCharacterCard = function(charKey) {
+        const char = evaCharacters[charKey];
+        if (!char) return;
+        document.getElementById('eva-modal-char-name').textContent = char.name;
+        document.getElementById('eva-modal-char-name').style.color = char.color;
+        let content = '';
+        if (char.image) content += `<img src="${char.image}" style="max-width:100%; max-height:300px; margin-bottom:20px;">`;
+        content += `<div style="color:#888; font-size:0.6rem; line-height:1.6; font-family:var(--font-mono);">${char.thoughts}</div>`;
+        document.getElementById('eva-modal-char-content').innerHTML = content;
+    };
+
+    window.closeEvaCharacterModal = function() {
+        document.getElementById('eva-character-modal').style.display = 'none';
+    };
+
+    // MyAnimeList XML upload handler
+    window.uploadMALXML = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(e.target.result, 'text/xml');
+                const animeList = xml.querySelectorAll('anime');
+                const grid = document.getElementById('anime-grid');
+                grid.innerHTML = '';
+                animeList.forEach(anime => {
+                    const title = anime.querySelector('series_title')?.textContent || 'Unknown';
+                    const imageUrl = anime.querySelector('series_image')?.textContent || '';
+                    if (imageUrl) {
+                        const card = document.createElement('div');
+                        card.className = 'anime-card';
+                        card.innerHTML = `
+                            <img src="${imageUrl}" alt="${title}" onerror="this.style.display='none'">
+                            <div class="anime-title">${title}</div>
+                        `;
+                        grid.appendChild(card);
+                    }
+                });
+                document.getElementById('watchlist-container').style.display = 'block';
+                document.getElementById('mal-placeholder').textContent = `// ${animeList.length} anime loaded`;
+            } catch (err) {
+                document.getElementById('mal-placeholder').textContent = '// Error parsing XML';
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    // F1 2024 races (Zandvoort onwards) with localStorage for thoughts
+    const f1Races = [
+        { round: 16, name: 'Dutch GP', circuit: 'Zandvoort', date: 'Sep 1, 2024', fp1: '13:30', fp2: '17:00', fp3: '12:00', quali: '15:00', race: '15:00' },
+        { round: 17, name: 'Italian GP', circuit: 'Monza', date: 'Sep 8, 2024', fp1: '13:30', fp2: '17:00', fp3: '12:00', quali: '16:00', race: '15:00' },
+        { round: 18, name: 'Azerbaijan GP', circuit: 'Baku', date: 'Sep 22, 2024', fp1: '09:30', fp2: '13:00', fp3: '12:00', quali: '15:00', race: '15:00' },
+        { round: 19, name: 'Singapore GP', circuit: 'Marina Bay', date: 'Sep 29, 2024', fp1: '12:30', fp2: '16:00', fp3: '13:30', quali: '17:00', race: '20:00' },
+        { round: 20, name: 'Japanese GP', circuit: 'Suzuka', date: 'Oct 6, 2024', fp1: '02:00', fp2: '06:00', fp3: '05:00', quali: '08:00', race: '14:00' },
+        { round: 21, name: 'Mexico City GP', circuit: 'Autodromo Hermanos', date: 'Oct 20, 2024', fp1: '16:30', fp2: '20:00', fp3: '15:00', quali: '18:00', race: '18:00' },
+        { round: 22, name: 'Brazilian GP', circuit: 'Interlagos', date: 'Nov 3, 2024', fp1: '13:30', fp2: '17:00', fp3: '12:00', quali: '16:00', race: '14:00' },
+        { round: 23, name: 'Las Vegas GP', circuit: 'Las Vegas Street', date: 'Nov 16, 2024', fp1: '22:30', fp2: '02:00', fp3: '22:30', quali: '02:00', race: '22:00' },
+        { round: 24, name: 'Abu Dhabi GP', circuit: 'Yas Marina', date: 'Dec 1, 2024', fp1: '08:30', fp2: '12:00', fp3: '08:30', quali: '12:00', race: '13:00' },
+    ];
+
+    window.initF1Journal = function() {
+        const container = document.getElementById('f1-races-container');
+        container.innerHTML = '';
+        f1Races.forEach(race => {
+            const storageKey = `f1_race_${race.round}`;
+            const savedThoughts = localStorage.getItem(storageKey) || '';
+            const card = document.createElement('div');
+            card.className = 'f1-race-card';
+            card.innerHTML = `
+                <div class="f1-race-header">
+                    <div>
+                        <div class="f1-race-name">R${race.round} — ${race.name}</div>
+                        <div class="f1-race-date">${race.circuit} · ${race.date}</div>
+                    </div>
+                </div>
+                <div class="f1-race-result">
+                    FP1: ${race.fp1} | FP2: ${race.fp2}<br>
+                    FP3: ${race.fp3} | Quali: ${race.quali} | Race: ${race.race}
+                </div>
+                <div class="f1-race-thoughts">
+                    <textarea id="f1-thoughts-${race.round}" placeholder="Your thoughts after the race...">${savedThoughts}</textarea>
+                </div>
+            `;
+            container.appendChild(card);
+            document.getElementById(`f1-thoughts-${race.round}`).addEventListener('input', function() {
+                localStorage.setItem(storageKey, this.value);
+            });
+        });
+    };
+
+    // Initialize F1 journal when section is shown
+    const showSectionOrig = window.showSection;
+    window.showSection = function(id) {
+        showSectionOrig(id);
+        if (id === 'f1-journal') initF1Journal();
     };
 
     function onYtMessage(e) {
@@ -4625,7 +4784,7 @@
                 if (currentMood === 'miami') {
                     document.getElementById('miami-welcome').classList.add('active');
                 } else {
-                    setTimeout(maybeShowBgMediaPrompt, 5000);
+                    // Skip the popup prompt — user can toggle in System section
                 }
             });
         }, 700);
@@ -4645,7 +4804,6 @@
         updateMoodBackground('miami');
         playMoodMusic('miami');
         updateMusicCard('miami', true);
-        setTimeout(maybeShowBgMediaPrompt, 5000);
     };
 
     // Also show Miami welcome after affirming Miami via mood prompt
